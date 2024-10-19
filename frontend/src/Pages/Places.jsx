@@ -1,24 +1,107 @@
-import React from 'react'
-import Carousal from "../Components/Carousal"
+import React, { useEffect, useState } from 'react';
+import Carousal from "../Components/Carousal";
+import CreateAxiosInstance from "../Axios"; // Import your axios instance function
 
 const Places = () => {
+  const axiosInstance = CreateAxiosInstance(); // Create an axios instance
+  const [place, setPlace] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [buttonText, setButtonText] = useState('Book Hotel'); // State for button text
+  const [buttonColor, setButtonColor] = useState('bg-blue-500'); // State for button color
 
-    const des = "The Taj Mahal is an ivory-white marble mausoleum on the south bank of the Yamuna river in the Indian city of Agra. It was commissioned in 1632 by the Mughal emperor, Shah Jahan (reigned from 1628 to 1658), to house the tomb of his favourite wife, Mumtaz Mahal. The tomb is the centrepiece of a 17-hectare (42-acre)complex, which includes a mosque and a guest house, and is set in formal gardens bounded on three sides by a crenellated wall.Construction of the mausoleum was essentially completed in 1643 but work continued on other phases of the project for another 10 years. The Taj Mahal complex is believed to have been completed in its entirety in 1653 at a cost estimated at the time to be around 32 million rupees, which in 2015 would be approximately 52.8 billion rupees (U.S. $827 million). The construction project employed some 20,000 artisans under the guidance of a board of architects led by the court architect to the emperor, Ustad Ahmad Lahauri.The Taj Mahal was designated as a UNESCO World Heritage Site in 1983 for being “the jewel of Muslim art in India and one of the universally admired masterpieces of the world’s heritage”. It is regarded by many as the best example of Mughal architecture and a symbol of India’s rich history. The Taj Mahal attracts 7–8 million visitors a year. In 2007, it was declared a winner of the New 7 Wonders of the World (2000–2007) initiative."
-    return (
-        <div className='mx-72'>
-            <Carousal />
-            <div className='flex justify-between'>
-                <h1 className='text-4xl font-semibold my-3'>Taj Mahal</h1>
-                <h1>Rating</h1>
-            </div>
-            <h1 className='text-xl'>
-                {des}
-            </h1>
-            <h1>
-                
-            </h1>
-        </div>
-    )
-}
+  useEffect(() => {
+    async function fetchPlace() {
+      try {
+        const response = await axiosInstance.get('get_place/?id=3'); // Use axiosInstance to fetch data
+        setPlace(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching place data:', error);
+        setLoading(false);
+      }
+    }
+    
+    fetchPlace();
+  }, []);
 
-export default Places
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!place) {
+    return <div>Place not found</div>;
+  }
+
+  let images = [];
+  try {
+    // Check if images is a valid string before parsing
+    if (place.images && typeof place.images === 'string') {
+      // Replace single quotes with double quotes for JSON parsing
+      const formattedImages = place.images.replace(/'/g, '"');
+      images = JSON.parse(formattedImages);
+    }
+  } catch (error) {
+    console.error('Error parsing images:', error);
+    images = []; // Fallback to an empty array if parsing fails
+  }
+
+  const handleBooking = () => {
+    // Change button text and color on click
+    setButtonText('Booked Successfully');
+    setButtonColor('bg-green-500'); // Change color to green
+  };
+
+  return (
+    <div className='mx-72'>
+      <Carousal images={images} /> {/* Pass the images to Carousal */}
+      <div className='flex justify-between mt-16'>
+        <h1 className='text-4xl font-semibold my-3'>{place.name}</h1>
+        <h1 className='text-lg'>Rating: {place.rating}</h1>
+      </div>
+      <h1 className='text-xl'>{place.description}</h1>
+      <div className='mt-4'>
+        <h2 className='text-2xl font-medium'>Price Range: {place.price_range || 'N/A'}</h2>
+      </div>
+      {/* Eco-Friendly Certified Badges Section */}
+      <div className='flex space-x-4 mt-6'>
+        {place.certifications && place.certifications.map((certification) => (
+          <div key={certification.name} className='flex flex-col items-center'>
+            <img 
+              src={certification.imageUrl} 
+              alt={certification.name} 
+              className='w-16 h-16 rounded-full' // Circular badge style
+            />
+            <span className='mt-2 text-center'>{certification.name}</span>
+          </div>
+        ))}
+      </div>
+      <div className='mt-6'>
+        <h2 className='text-2xl font-medium mb-4'>Reviews:</h2>
+        {place.reviews && place.reviews.length > 0 ? (
+          <ul className='space-y-4'>
+            {place.reviews.map((review) => (
+              <li key={review.id} className='border p-4 rounded'>
+                <div className='flex justify-between items-center'>
+                  <h3 className='text-lg font-semibold'>Rating: {review.rating}</h3>
+                </div>
+                <p className='mt-2'>{review.review}</p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No reviews available for this place.</p>
+        )}
+      </div>
+      <div className='mt-8 flex justify-center'>
+        <button
+          onClick={handleBooking}
+          className={`${buttonColor} hover:bg-green-700 text-white font-bold py-2 px-4 rounded`} // Use buttonColor state for button background color
+        >
+          {buttonText} {/* Use buttonText state for button label */}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default Places;
