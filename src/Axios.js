@@ -2,7 +2,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const axiosInstance = axios.create({
-  baseURL: 'http://127.0.0.1:8000/',
+  baseURL: 'http://13.60.208.123:8000/',
 });
 
 const CreateAxiosInstance = () => {

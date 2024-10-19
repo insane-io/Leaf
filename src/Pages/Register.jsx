@@ -7,7 +7,7 @@ const Register = () => {
 
     const axiosInstance = CreateAxiosInstance()
 
-    const { setLogin, setUid, setUser } = useState()
+    const { setLogin } = useState()
     const [staff, setStaff] = useState("baseUser")
     const [formData, setFormData] = useState({
         email: "",
@@ -34,7 +34,7 @@ const Register = () => {
         }
 
         try {
-          const res = await axios.post( "http://127.0.0.1:8000/signup/", {
+          const res = await axios.post( "http://13.60.208.123:8000/signup/", {
             email: formData.email,
             username: formData.username,
             first_name: formData.first_name,
@@ -46,14 +46,11 @@ const Register = () => {
           setLogin(true)
           localStorage.setItem("access_token", res.data.access);
           localStorage.setItem("refresh_token", res.data.refresh);
-          res.data.role === null ? setUser("undefined") : setUser(res.data.role);
           res.data.role === null ? localStorage.setItem("role", "undefined") : localStorage.setItem("role", res.data.role)
           axiosInstance.defaults.headers["Authorization"] =
             "JWT " + localStorage.getItem("access_token");
           console.log("Navigating");
-          setUser(res.data.role)
-          const decode = res.data.access
-          setUid(decode.user_id)
+        //   const decode = res.data.access
           navigate("/");
         } catch (error) {
           console.error("Error:", error);

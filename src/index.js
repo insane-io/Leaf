@@ -9,6 +9,7 @@ import DashBoard from "./Pages/DashBoard"
 import { UserProvider } from './Context/MyContext';
 import Login from './Pages/Login';
 import Register from './Pages/Register';
+import Places from './Pages/Places';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -18,6 +19,7 @@ const router = createBrowserRouter(
         <Route path='dashboard' element={<DashBoard/>} />
         <Route path='login' element={<Login/>} />
         <Route path='register' element={<Register/>} />
+        <Route path='place' element={<Places/>} />
       </Route>
     </Route>
   )
