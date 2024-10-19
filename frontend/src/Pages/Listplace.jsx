@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import CreateAxiosInstance from "../Axios";
+import Reviews from "../Components/Reviews";
 
 const Listplace = () => {
   const axiosInstance = CreateAxiosInstance();
@@ -20,8 +21,26 @@ const Listplace = () => {
     async function fetchData() {
       try {
         const res = await axiosInstance.get('get_place/');
-        setPlaces(res.data);
-        setFilteredPlaces(res.data);
+        
+        // Parse images from string to array safely
+        const formattedPlaces = res.data.map((place) => {
+          // Check if place.images is a string and convert it to valid JSON
+          let imagesArray;
+          try {
+            imagesArray = JSON.parse(place.images.replace(/'/g, '"')); // Replaces single quotes with double quotes
+          } catch (error) {
+            console.error('Error parsing images:', error);
+            imagesArray = []; // Fallback to an empty array if parsing fails
+          }
+
+          return {
+            ...place,
+            images: Array.isArray(imagesArray) ? imagesArray : [imagesArray], // Ensure it's an array
+          };
+        });
+        
+        setPlaces(formattedPlaces);
+        setFilteredPlaces(formattedPlaces);
       } catch (error) {
         console.error(error);
       }
@@ -107,10 +126,10 @@ const Listplace = () => {
             key={place.id}
             className="relative overflow-hidden rounded-lg shadow-lg cursor-pointer"
             whileHover={{ scale: 1.05 }}
-            onClick={() => navigate(`/places/${place.id}`)}
+            onClick={() => navigate(`/place/${place.id}`)}
           >
             <img
-              src={place.website} // Assuming the 'website' field holds the image URL
+              src={place.images[0]} // Access the first image safely
               alt={place.name}
               className="w-full h-64 object-cover"
             />
@@ -127,6 +146,7 @@ const Listplace = () => {
           </motion.div>
         ))}
       </div>
+      <Reviews />
     </div>
   );
 };
