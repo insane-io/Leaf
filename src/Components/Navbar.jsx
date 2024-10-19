@@ -6,6 +6,7 @@ import { MyContext } from "../Context/MyContext"
 const links = [
   { name: "Home", path: "/", color: "#808080" },
   { name: "Plan Your Trip", path: "/dashboard", color: "#808080" },
+  { name: "Places", path: "/listplace", color: "#808080" },
 ];
 
 const Navbar = () => {
