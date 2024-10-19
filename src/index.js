@@ -6,12 +6,17 @@ import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } 
 import Home from './Pages/Home';
 import BaseLayout from './BaseLayout';
 import { UserProvider } from './Context/MyContext';
+import Tour_guider from './Pages/Tour_guider';
+
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route>
       <Route path='/' element={<BaseLayout />}>
         <Route path='' element={<Home />} />
+        <Route path='tourguider' element={<Tour_guider />} />
+        
+        
       </Route>
     </Route>
   )

@@ -4,11 +4,11 @@ import { motion } from 'framer-motion';
 // import logo from "../Assets/logo.png";
 
 const links = [
-  { name: "Home", path: "/", color: "#FF6B66" },
-  { name: "Events", path: "/events", color: "#FF6B66" },
-  { name: "Committee", path: "/Commiteehome", color: "#FF6B66" },
-  { name: "Profile", path: "/Profile", color: "#FF6B66", protected: true },
-  { name: "Login", path: "/login", color: "#FF6B66", protected: false }
+  { name: "Home", path: "/", color: "#00" },
+  { name: "Events", path: "/events", color: "#00FFFFF" },
+  { name: "Committee", path: "/Commiteehome", color: "#00FFFFF" },
+  { name: "Profile", path: "/Profile", color: "#00FFFFF", protected: true },
+  { name: "Login", path: "/login", color: "#00FFFFF", protected: false }
 ];
 
 const Navbar = () => {
@@ -50,7 +50,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`bg-orange-600 font-bold text-2xl fixed w-full z-20 top-0 start-0 transition-transform duration-300 ease-in-out ${
+      className={`bg-[#E5E4E2] font-bold text-2xl fixed w-full z-20 top-0 start-0 transition-transform duration-300 ease-in-out ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
     >
