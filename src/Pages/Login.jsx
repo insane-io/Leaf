@@ -46,12 +46,12 @@ const Login = () => {
               <img src="https://images.squarespace-cdn.com/content/v1/6362a31ebcf57907d45a58bc/4caac7f7-353a-45d6-8817-8e8a4a4fb853/wordsmith-custom-blog-Internal-communications-importing-marketing-lessons.png?format=1500w" alt="random" className="w-11/12 lg:h-[29rem]"/>
         </div>
         <div className="md:col-span-2 col-span-5 m-16 flex flex-col justify-center" >
-          <label htmlFor="user-email" className="text-[#FF6B66] text-md font-bold" style={{ paddingTop: "13px" }}>
+          <label htmlFor="user-email" className="text-[#008370] text-md font-bold" style={{ paddingTop: "13px" }}>
             Email
           </label>
           <input
             id="user-email"
-            className="form-content my-2 bg-[#faefe8] p-3 rounded-md focus:outline-none"
+            className="form-content my-2 bg-[#d6ebe8] p-3 rounded-md focus:outline-none"
             type="email"
             name="email"
             placeholder="Email"
@@ -60,12 +60,12 @@ const Login = () => {
             required
           />
           <div className="form-border"></div>
-          <label htmlFor="user-password" className="text-[#FF6B66] text-md font-bold" style={{ paddingTop: "22px" }}>
+          <label htmlFor="user-password" className="text-[#008370] text-md font-bold" style={{ paddingTop: "22px" }}>
             Password
           </label>
           <input
             id="user-password"
-            className="form-content my-2 bg-[#faefe8] p-3 rounded-md focus:outline-none"
+            className="form-content my-2 bg-[#d6ebe8] p-3 rounded-md focus:outline-none"
             type="password"
             name="password"
             placeholder="******"
@@ -78,11 +78,11 @@ const Login = () => {
             type="submit"
             name="submit"
             value="LOGIN"
-            className="bg-[#FF6B66] p-2 rounded-xl text-white mt-4 cursor-pointer hover:bg-gray-900"
+            className="bg-[#008370] p-2 rounded-xl text-white mt-4 cursor-pointer hover:bg-gray-900"
             onClick={handleSubmit}
           />
           <a href="#" id="signup">
-            <Link to="/register" className="mb-4 text-[#FF6B66] font-bold text-sm hover:text-blue-800">
+            <Link to="/register" className="mb-4 text-[#008370] font-bold text-sm hover:text-blue-800">
               Don't Have an account?
             </Link>
           </a>

@@ -52,7 +52,7 @@ function Map() {
               draggable: false
             })
               .setLngLat(facility.location)
-              .setPopup(new mapboxgl.Popup().setHTML('<p style="margin:5px">E-facility!</p>'))
+              .setPopup(new mapboxgl.Popup().setHTML('<p style="margin:5px">!</p>'))
               .addTo(map);
           }
         });
@@ -113,7 +113,7 @@ function Map() {
 
   return (
     <>
-    <div className='d-flex justify-content-center mt-10'>
+    <div className='d-flex justify-content-center '>
       <style>{`
         .mapBox {
           width: 95%; /* Adjust the width for responsiveness */

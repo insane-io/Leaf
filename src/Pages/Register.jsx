@@ -16,7 +16,6 @@ const Register = () => {
         username: "",
         first_name: "",
         last_name: "",
-        // phone: "",
     });
     const navigate = useNavigate();
 

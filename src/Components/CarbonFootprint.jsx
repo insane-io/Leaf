@@ -84,8 +84,7 @@ function CarbonFootprintCalculator() {
           <div className="flex justify-center w-full mb-6">
             <button
               className={`px-4 py-2 w-full flex items-center justify-center rounded-md ${tripType === 'flight' ? 'bg-[#d6ebe8] border-2 border-[#008370] text-[#008370]' : 'border-2 text-gray-700'}`}
-              onClick={() => setTripType('flight')}
-            >
+              onClick={() => setTripType('flight')}>
               <MdFlight /> Flight
             </button>
             <button
