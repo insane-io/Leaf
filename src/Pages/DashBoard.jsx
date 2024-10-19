@@ -6,7 +6,100 @@ const RouteSearch = () => {
   const [source, setSource] = useState("")
   const [destination, setDestination] = useState("")
   const [maps, setMaps] = useState()
-  const [data, setData] = useState()
+  const [data, setData] = useState(
+    {
+      "routes": [
+          {
+              "route": "Mumbai-Kota-Delhi",
+              "latitude_longitude": {
+                  "City_1": {
+                      "latitude": 19.076,
+                      "longitude": 72.8777
+                  },
+                  "City_2": {
+                      "latitude": 25.184,
+                      "longitude": 75.8304
+                  },
+                  "City_3": {
+                      "latitude": 28.6139,
+                      "longitude": 77.209
+                  }
+              },
+              "carbon_footprint": "120 kg CO2e",
+              "distance": "1170.0 km",
+              "vehicle": "Train",
+              "estimated_cost": 1755.0,
+              "carbon_emission": "47.97 kg CO2"
+          },
+          {
+              "route": "Mumbai-Ahmedabad-Delhi",
+              "latitude_longitude": {
+                  "City_1": {
+                      "latitude": 19.076,
+                      "longitude": 72.8777
+                  },
+                  "City_2": {
+                      "latitude": 23.0225,
+                      "longitude": 72.5714
+                  },
+                  "City_3": {
+                      "latitude": 28.6139,
+                      "longitude": 77.209
+                  }
+              },
+              "carbon_footprint": "130 kg CO2e",
+              "distance": "1250.0 km",
+              "vehicle": "Bus",
+              "estimated_cost": 1500.0,
+              "carbon_emission": "85.0 kg CO2"
+          },
+          {
+              "route": "Mumbai-Indore-Delhi",
+              "latitude_longitude": {
+                  "City_1": {
+                      "latitude": 19.076,
+                      "longitude": 72.8777
+                  },
+                  "City_2": {
+                      "latitude": 22.7206,
+                      "longitude": 75.8765
+                  },
+                  "City_3": {
+                      "latitude": 28.6139,
+                      "longitude": 77.209
+                  }
+              },
+              "carbon_footprint": "140 kg CO2e",
+              "distance": "1300.0 km",
+              "vehicle": "Car",
+              "estimated_cost": 3900.0,
+              "carbon_emission": "156.0 kg CO2"
+          },
+          {
+              "route": "Mumbai-Surat-Delhi",
+              "latitude_longitude": {
+                  "City_1": {
+                      "latitude": 19.076,
+                      "longitude": 72.8777
+                  },
+                  "City_2": {
+                      "latitude": 21.1702,
+                      "longitude": 72.8311
+                  },
+                  "City_3": {
+                      "latitude": 28.6139,
+                      "longitude": 77.209
+                  }
+              },
+              "carbon_footprint": "150 kg CO2e",
+              "distance": "1350.0 km",
+              "vehicle": "Plane",
+              "estimated_cost": 6750.0,
+              "carbon_emission": "384.75 kg CO2"
+          }
+      ]
+  }
+  )
 
   const axiosInstance = CreateaxiosInstance();
 
@@ -56,14 +149,14 @@ const RouteSearch = () => {
           Search
         </button>
       </div>
-      <Maps data={maps}/>
+      <Maps data={maps} />
 
       {data && data.routes && data.routes.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
           {data.routes.map((route, index) => (
             <div
               key={index}
-              onClick={()=>handleClick(index)}
+              onClick={() => handleClick(index)}
               className="border p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow bg-gray-50"
             >
               <div className="space-y-2">

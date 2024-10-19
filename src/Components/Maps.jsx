@@ -4,7 +4,6 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoic29oYW0xMiIsImEiOiJjbG5mMThidXcwa2o4Mml0Y3IzMHh0ZzM1In0.NKrFUG12iisWBbf-TVp34g';
 
-// Sample routes data from the JSON
 const routesData = {
   route1: {
     name: 'MumbaiSuratAhmedabadUdaipurJaipurDelhi',
@@ -64,9 +63,11 @@ const routesData = {
   }
 };
 
-function Map({ routeId = 'route1' }) {
-  const [map, setMap] = useState(null);
+function Map({ routeId = 'route1', data }) {
 
+  console.log(data)
+  const [map, setMap] = useState(null);
+  
   const transportConfig = {
     Car: {
       icon: '🚗',
@@ -85,37 +86,45 @@ function Map({ routeId = 'route1' }) {
     }
   };
 
-  useEffect(() => {
-    const routeData = routesData[routeId];
-    if (!routeData) return;
+  const defaultLatitude = 19.076; 
+  const defaultLongitude = 72.8777;
 
-    const { cities, vehicle } = routeData;
-    const transport = transportConfig[vehicle];
+  useEffect(() => {
+
+    console.log(data)
+    const routeData = routesData[routeId];
+    const { cities, vehicle } = routeData
+    const transport = transportConfig[vehicle]  
 
     const map = new mapboxgl.Map({
       style: 'mapbox://styles/mapbox/light-v11',
-      center: cities[0].coordinates,
+      center: cities[0]?.coordinates,
       zoom: 5,
       container: 'map',
       antialias: true
     });
 
     setMap(map);
-
+    console.log("hello111");
     map.on('load', () => {
-      // Add markers for all cities
-      cities.forEach((city, index) => {
-        const color = index === 0 ? '#00ff00' : 
-                     index === cities.length - 1 ? '#ff0000' : '#ffa500';
-        
+      const cityArray = Array.isArray(data.latitude_longitude) ? data.latitude_longitude : Object.values(data.latitude_longitude)
+      console.log("array",data)
+      cityArray.map((city, index) => {
+        const latitude = city?.latitude || defaultLatitude;
+        const longitude = city?.longitude || defaultLongitude;
+        console.log("lat ", latitude, longitude);
+        const color = index === 0 ? '#00ff00' :
+          index === cities.length - 1 ? '#ff0000' : '#ffa500';
+
         new mapboxgl.Marker({ color })
-          .setLngLat(city.coordinates)
+          .setLngLat([longitude, latitude])
           .setPopup(
             new mapboxgl.Popup().setHTML(`
               <div style="padding: 10px;">
                 <h3 style="margin: 0;">${city.name}</h3>
                 <p style="margin: 5px 0 0 0;">
-                  ${index === 0 ? 'Starting Point' : 
+                  ${index === 0 ?
+                    'Starting Point' :
                     index === cities.length - 1 ? 'End Point' : 'Waypoint'}
                 </p>
               </div>
@@ -123,8 +132,6 @@ function Map({ routeId = 'route1' }) {
           )
           .addTo(map);
       });
-
-      // Add route line
       map.addSource('route', {
         type: 'geojson',
         data: {
@@ -132,7 +139,7 @@ function Map({ routeId = 'route1' }) {
           properties: {},
           geometry: {
             type: 'LineString',
-            coordinates: cities.map(city => city.coordinates)
+            coordinates: cityArray.map(city => city.coordinates)
           }
         }
       });
@@ -174,18 +181,16 @@ function Map({ routeId = 'route1' }) {
           `)
         )
         .addTo(map);
-
-      // Fit bounds to show all markers
       const bounds = new mapboxgl.LngLatBounds();
       cities.forEach(city => bounds.extend(city.coordinates));
-      
+
       map.fitBounds(bounds, {
         padding: 50
       });
     });
 
     return () => map.remove();
-  }, [routeId]);
+  }, [data]);
 
   return (
     <div className="d-flex justify-content-center">
@@ -200,21 +205,11 @@ function Map({ routeId = 'route1' }) {
         .transport-marker {
           cursor: pointer;
           font-size: 24px;
+          text-align: center;
           background-color: white;
-          border-radius: 50%;
+          border-radius: 3px;
           padding: 5px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        @media (max-width: 768px) {
-          .mapBox {
-            width: 90%;
-            height: 30vh;
-            border-radius: 1rem;
-          }
+          border: 1px solid rgba(0, 0, 0, 0.3);
         }
       `}</style>
       <div id="map" className="mapBox" />
