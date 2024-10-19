@@ -4,134 +4,64 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoic29oYW0xMiIsImEiOiJjbG5mMThidXcwa2o4Mml0Y3IzMHh0ZzM1In0.NKrFUG12iisWBbf-TVp34g';
 
-const routesData = {
-  route1: {
-    name: 'MumbaiSuratAhmedabadUdaipurJaipurDelhi',
-    cities: [
-      { name: 'Mumbai', coordinates: [72.8777, 19.076] },
-      { name: 'Surat', coordinates: [72.8311, 21.1702] },
-      { name: 'Ahmedabad', coordinates: [72.5714, 23.0225] },
-      { name: 'Udaipur', coordinates: [73.6967, 24.5854] },
-      { name: 'Jaipur', coordinates: [75.7873, 26.9124] },
-      { name: 'Delhi', coordinates: [77.2089, 28.6139] }
-    ],
-    vehicle: 'Train',
-    distance: '1350.0 km',
-    carbonEmission: '55.35 kg CO2'
-  },
-  route2: {
-    name: 'MumbaiVadodaraKotaAgraDelhi',
-    cities: [
-      { name: 'Mumbai', coordinates: [72.8777, 19.076] },
-      { name: 'Vadodara', coordinates: [73.1812, 22.3039] },
-      { name: 'Kota', coordinates: [75.8333, 25.1848] },
-      { name: 'Agra', coordinates: [78.0081, 27.1767] },
-      { name: 'Delhi', coordinates: [77.2089, 28.6139] }
-    ],
-    vehicle: 'Train',
-    distance: '1280.0 km',
-    carbonEmission: '52.48 kg CO2'
-  },
-  route3: {
-    name: 'MumbaiSuratIndoreGwaliorAgraDelhi',
-    cities: [
-      { name: 'Mumbai', coordinates: [72.8777, 19.076] },
-      { name: 'Surat', coordinates: [72.8311, 21.1702] },
-      { name: 'Indore', coordinates: [75.8472, 22.7206] },
-      { name: 'Gwalior', coordinates: [78.1828, 26.2186] },
-      { name: 'Agra', coordinates: [78.0081, 27.1767] },
-      { name: 'Delhi', coordinates: [77.2089, 28.6139] }
-    ],
-    vehicle: 'Car',
-    distance: '1400.0 km',
-    carbonEmission: '168.0 kg CO2'
-  },
-  route4: {
-    name: 'MumbaiSuratAhmedabadUdaipurKotaAgraDelhi',
-    cities: [
-      { name: 'Mumbai', coordinates: [72.8777, 19.076] },
-      { name: 'Surat', coordinates: [72.8311, 21.1702] },
-      { name: 'Ahmedabad', coordinates: [72.5714, 23.0225] },
-      { name: 'Udaipur', coordinates: [73.6967, 24.5854] },
-      { name: 'Kota', coordinates: [75.8333, 25.1848] },
-      { name: 'Agra', coordinates: [78.0081, 27.1767] },
-      { name: 'Delhi', coordinates: [77.2089, 28.6139] }
-    ],
-    vehicle: 'Bus',
-    distance: '1450.0 km',
-    carbonEmission: '98.6 kg CO2'
-  }
-};
-
-function Map({ routeId = 'route1', data }) {
-
-  console.log(data)
+function Map({ data, onCoordinateSelect }) {
+  const [selectedCoordinates, setSelectedCoordinates] = useState(null);
   const [map, setMap] = useState(null);
-  
+
   const transportConfig = {
-    Car: {
-      icon: '🚗',
-      lineColor: '#3498db',
-      dashArray: [1]
-    },
-    Train: {
-      icon: '🚂',
-      lineColor: '#2ecc71',
-      dashArray: [1]
-    },
-    Bus: {
-      icon: '🚌',
-      lineColor: '#f1c40f',
-      dashArray: [1]
-    }
+    Car: { icon: '🚗', lineColor: '#3498db', dashArray: [1] },
+    Train: { icon: '🚂', lineColor: '#2ecc71', dashArray: [1] },
+    Bus: { icon: '🚌', lineColor: '#f1c40f', dashArray: [1] },
+    Plane: { icon: '✈️', lineColor: '#f1c40f', dashArray: [1] }
   };
 
-  const defaultLatitude = 19.076; 
-  const defaultLongitude = 72.8777;
-
   useEffect(() => {
+    if (!data || !data.latitude_longitude) return;
 
-    console.log(data)
-    const routeData = routesData[routeId];
-    const { cities, vehicle } = routeData
-    const transport = transportConfig[vehicle]  
+    const cityArray = Object.values(data.latitude_longitude);
+    const transport = transportConfig[data.vehicle] || transportConfig['Car'];
 
     const map = new mapboxgl.Map({
       style: 'mapbox://styles/mapbox/light-v11',
-      center: cities[0]?.coordinates,
+      center: cityArray[0] ? [cityArray[0].longitude, cityArray[0].latitude] : [72.8777, 19.076],
       zoom: 5,
       container: 'map',
       antialias: true
     });
 
     setMap(map);
-    console.log("hello111");
-    map.on('load', () => {
-      const cityArray = Array.isArray(data.latitude_longitude) ? data.latitude_longitude : Object.values(data.latitude_longitude)
-      console.log("array",data)
-      cityArray.map((city, index) => {
-        const latitude = city?.latitude || defaultLatitude;
-        const longitude = city?.longitude || defaultLongitude;
-        console.log("lat ", latitude, longitude);
-        const color = index === 0 ? '#00ff00' :
-          index === cities.length - 1 ? '#ff0000' : '#ffa500';
 
-        new mapboxgl.Marker({ color })
-          .setLngLat([longitude, latitude])
+    map.on('load', () => {
+      cityArray.forEach((city, index) => {
+        const color = index === 0 ? '#00ff00' : index === cityArray.length - 1 ? '#ff0000' : '#ffa500';
+
+        const markerElement = document.createElement('div');
+        markerElement.className = 'marker';
+        markerElement.style.backgroundColor = color;
+        markerElement.style.width = '20px';
+        markerElement.style.height = '20px';
+        markerElement.style.borderRadius = '50%';
+
+        markerElement.addEventListener('click', () => {
+          setSelectedCoordinates({ latitude: city.latitude, longitude: city.longitude });
+          onCoordinateSelect?.({ latitude: city.latitude, longitude: city.longitude });
+        });
+
+        new mapboxgl.Marker(markerElement)
+          .setLngLat([city.longitude, city.latitude])
           .setPopup(
             new mapboxgl.Popup().setHTML(`
               <div style="padding: 10px;">
-                <h3 style="margin: 0;">${city.name}</h3>
+                <h3 style="margin: 0;">City ${index + 1}</h3>
                 <p style="margin: 5px 0 0 0;">
-                  ${index === 0 ?
-                    'Starting Point' :
-                    index === cities.length - 1 ? 'End Point' : 'Waypoint'}
+                  ${index === 0 ? 'Starting Point' : index === cityArray.length - 1 ? 'End Point' : 'Waypoint'}
                 </p>
               </div>
             `)
           )
           .addTo(map);
       });
+
       map.addSource('route', {
         type: 'geojson',
         data: {
@@ -139,12 +69,11 @@ function Map({ routeId = 'route1', data }) {
           properties: {},
           geometry: {
             type: 'LineString',
-            coordinates: cityArray.map(city => city.coordinates)
+            coordinates: cityArray.map(city => [city.longitude, city.latitude])
           }
         }
       });
 
-      // Add the line layer
       map.addLayer({
         id: 'route',
         type: 'line',
@@ -160,9 +89,8 @@ function Map({ routeId = 'route1', data }) {
         }
       });
 
-      // Add transport mode indicator at the middle point
-      const midIndex = Math.floor(cities.length / 2);
-      const midpoint = cities[midIndex].coordinates;
+      const midIndex = Math.floor(cityArray.length / 2);
+      const midpoint = [cityArray[midIndex].longitude, cityArray[midIndex].latitude];
 
       const el = document.createElement('div');
       el.className = 'transport-marker';
@@ -174,20 +102,20 @@ function Map({ routeId = 'route1', data }) {
           new mapboxgl.Popup().setHTML(`
             <div style="padding: 10px;">
               <h3 style="margin: 0;">Route Info</h3>
-              <p style="margin: 5px 0;">Transport: ${vehicle}</p>
-              <p style="margin: 5px 0;">Distance: ${routeData.distance}</p>
-              <p style="margin: 5px 0;">Emissions: ${routeData.carbonEmission}</p>
+              <p style="margin: 5px 0;">Transport: ${data.vehicle}</p>
+              <p style="margin: 5px 0;">Distance: ${data.distance}</p>
+              <p style="margin: 5px 0;">Emissions: ${data.carbon_emission}</p>
             </div>
           `)
         )
         .addTo(map);
-      const bounds = new mapboxgl.LngLatBounds();
-      cities.forEach(city => bounds.extend(city.coordinates));
 
-      map.fitBounds(bounds, {
-        padding: 50
-      });
+      const bounds = new mapboxgl.LngLatBounds();
+      cityArray.forEach(city => bounds.extend([city.longitude, city.latitude]));
+      map.fitBounds(bounds, { padding: 50 });
     });
+
+    
 
     return () => map.remove();
   }, [data]);
@@ -202,6 +130,11 @@ function Map({ routeId = 'route1', data }) {
           border: 1px solid rgba(0,0,0,0.5);
         }
 
+        .marker {
+          cursor: pointer;
+          background-color: #f00;
+        }
+
         .transport-marker {
           cursor: pointer;
           font-size: 24px;
@@ -213,6 +146,11 @@ function Map({ routeId = 'route1', data }) {
         }
       `}</style>
       <div id="map" className="mapBox" />
+      {selectedCoordinates && (
+        <div className="selected-coordinates">
+          Selected: Lat {selectedCoordinates.latitude}, Lng {selectedCoordinates.longitude}
+        </div>
+      )}
     </div>
   );
 }
