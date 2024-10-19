@@ -2,11 +2,11 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MyContext } from "../Context/MyContext"
-import { h1 } from 'framer-motion/client';
 
 const links = [
   { name: "Home", path: "/", color: "#808080" },
-  { name: "Events", path: "/dashboard", color: "#808080" },
+  { name: "Plan Your Trip", path: "/dashboard", color: "#808080" },
+  { name: "Places", path: "/listplace", color: "#808080" },
 ];
 
 const Navbar = () => {
