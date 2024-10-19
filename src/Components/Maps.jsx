@@ -1,139 +1,224 @@
 import React, { useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css'; 
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoic29oYW0xMiIsImEiOiJjbG5mMThidXcwa2o4Mml0Y3IzMHh0ZzM1In0.NKrFUG12iisWBbf-TVp34g';
 
-function Map() {
-  const [lat, setLat] = useState()
-  const [lon, setLon] = useState()
-  const [facilities, setFacilities] = useState([
-      { id: 1, location: [72.83627602340445,18.959732630284932] },
-      { id: 2, location: [73.83627602340445,19.959732630284932] },
-      { id: 3, location: [72.93627602340445,18.959732630284932] }
-  ])
+// Sample routes data from the JSON
+const routesData = {
+  route1: {
+    name: 'MumbaiSuratAhmedabadUdaipurJaipurDelhi',
+    cities: [
+      { name: 'Mumbai', coordinates: [72.8777, 19.076] },
+      { name: 'Surat', coordinates: [72.8311, 21.1702] },
+      { name: 'Ahmedabad', coordinates: [72.5714, 23.0225] },
+      { name: 'Udaipur', coordinates: [73.6967, 24.5854] },
+      { name: 'Jaipur', coordinates: [75.7873, 26.9124] },
+      { name: 'Delhi', coordinates: [77.2089, 28.6139] }
+    ],
+    vehicle: 'Train',
+    distance: '1350.0 km',
+    carbonEmission: '55.35 kg CO2'
+  },
+  route2: {
+    name: 'MumbaiVadodaraKotaAgraDelhi',
+    cities: [
+      { name: 'Mumbai', coordinates: [72.8777, 19.076] },
+      { name: 'Vadodara', coordinates: [73.1812, 22.3039] },
+      { name: 'Kota', coordinates: [75.8333, 25.1848] },
+      { name: 'Agra', coordinates: [78.0081, 27.1767] },
+      { name: 'Delhi', coordinates: [77.2089, 28.6139] }
+    ],
+    vehicle: 'Train',
+    distance: '1280.0 km',
+    carbonEmission: '52.48 kg CO2'
+  },
+  route3: {
+    name: 'MumbaiSuratIndoreGwaliorAgraDelhi',
+    cities: [
+      { name: 'Mumbai', coordinates: [72.8777, 19.076] },
+      { name: 'Surat', coordinates: [72.8311, 21.1702] },
+      { name: 'Indore', coordinates: [75.8472, 22.7206] },
+      { name: 'Gwalior', coordinates: [78.1828, 26.2186] },
+      { name: 'Agra', coordinates: [78.0081, 27.1767] },
+      { name: 'Delhi', coordinates: [77.2089, 28.6139] }
+    ],
+    vehicle: 'Car',
+    distance: '1400.0 km',
+    carbonEmission: '168.0 kg CO2'
+  },
+  route4: {
+    name: 'MumbaiSuratAhmedabadUdaipurKotaAgraDelhi',
+    cities: [
+      { name: 'Mumbai', coordinates: [72.8777, 19.076] },
+      { name: 'Surat', coordinates: [72.8311, 21.1702] },
+      { name: 'Ahmedabad', coordinates: [72.5714, 23.0225] },
+      { name: 'Udaipur', coordinates: [73.6967, 24.5854] },
+      { name: 'Kota', coordinates: [75.8333, 25.1848] },
+      { name: 'Agra', coordinates: [78.0081, 27.1767] },
+      { name: 'Delhi', coordinates: [77.2089, 28.6139] }
+    ],
+    vehicle: 'Bus',
+    distance: '1450.0 km',
+    carbonEmission: '98.6 kg CO2'
+  }
+};
 
-  useEffect(()=>{    
-      async function getdata(){
-          try{
-              if(navigator.geolocation){
-                navigator.geolocation.getCurrentPosition((position) => {
-                  setLat(position.coords.latitude)
-                  setLon(position.coords.longitude)
-                })
-              }
-          }catch(err){
-              console.log(err.message)
-          }
-      }
-      getdata();
-  },[])
+function Map({ routeId = 'route1' }) {
+  const [map, setMap] = useState(null);
+
+  const transportConfig = {
+    Car: {
+      icon: '🚗',
+      lineColor: '#3498db',
+      dashArray: [1]
+    },
+    Train: {
+      icon: '🚂',
+      lineColor: '#2ecc71',
+      dashArray: [1]
+    },
+    Bus: {
+      icon: '🚌',
+      lineColor: '#f1c40f',
+      dashArray: [1]
+    }
+  };
 
   useEffect(() => {
-    if (lat !== undefined && lon !== undefined) {
-      const map = new mapboxgl.Map({
-        style: 'mapbox://styles/mapbox/light-v11',
-        center: [lon, lat],
-        zoom: 4.5,
-        container: 'map',
-        antialias: true
+    const routeData = routesData[routeId];
+    if (!routeData) return;
+
+    const { cities, vehicle } = routeData;
+    const transport = transportConfig[vehicle];
+
+    const map = new mapboxgl.Map({
+      style: 'mapbox://styles/mapbox/light-v11',
+      center: cities[0].coordinates,
+      zoom: 5,
+      container: 'map',
+      antialias: true
+    });
+
+    setMap(map);
+
+    map.on('load', () => {
+      // Add markers for all cities
+      cities.forEach((city, index) => {
+        const color = index === 0 ? '#00ff00' : 
+                     index === cities.length - 1 ? '#ff0000' : '#ffa500';
+        
+        new mapboxgl.Marker({ color })
+          .setLngLat(city.coordinates)
+          .setPopup(
+            new mapboxgl.Popup().setHTML(`
+              <div style="padding: 10px;">
+                <h3 style="margin: 0;">${city.name}</h3>
+                <p style="margin: 5px 0 0 0;">
+                  ${index === 0 ? 'Starting Point' : 
+                    index === cities.length - 1 ? 'End Point' : 'Waypoint'}
+                </p>
+              </div>
+            `)
+          )
+          .addTo(map);
       });
 
-      map.on('load', () => {
-        const layers = map.getStyle().layers;
-        const labelLayerId = layers.find(
-          (layer) => layer.type === 'symbol' && layer.layout['text-field']
-        ).id;
-        
-        facilities.forEach(facility => {
-          const distance = calculateDistance(lat, lon, facility.location[1], facility.location[0]);
-          if (distance <= 5) {
-            new mapboxgl.Marker({
-              draggable: false
-            })
-              .setLngLat(facility.location)
-              .setPopup(new mapboxgl.Popup().setHTML('<p style="margin:5px">!</p>'))
-              .addTo(map);
+      // Add route line
+      map.addSource('route', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates: cities.map(city => city.coordinates)
           }
-        });
-
-        new mapboxgl.Marker({
-          draggable: false,
-          color: 'red'
-        })
-        .setLngLat([lon, lat]) 
-        .setPopup(new mapboxgl.Popup().setHTML('<p style="margin:5px">My Location</p>')) 
-        .addTo(map);
-        
-        map.addLayer(
-          {
-            id: 'add-3d-buildings',
-            source: 'composite',
-            'source-layer': 'building',
-            filter: ['==', 'extrude', 'true'],
-            type: 'fill-extrusion',
-            minzoom: 15,
-            paint: {
-              'fill-extrusion-color': '#aaa',
-              'fill-extrusion-height': ['interpolate', ['linear'], ['zoom'], 15, 0, 15.05, ['get', 'height']],
-              'fill-extrusion-base': ['interpolate', ['linear'], ['zoom'], 15, 0, 15.05, ['get', 'min_height']],
-              'fill-extrusion-opacity': 0.6
-            }
-          },
-          labelLayerId
-        );
-
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-          const R = 6371; // Radius of the earth in km
-          const dLat = deg2rad(lat2 - lat1);  // deg2rad below
-          const dLon = deg2rad(lon2 - lon1);
-          const a = 
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-            Math.sin(dLon / 2) * Math.sin(dLon / 2)
-            ; 
-          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); 
-          const d = R * c; // Distance in km
-          return d;
-        }
-
-        function deg2rad(deg) {
-          return deg * (Math.PI/180)
         }
       });
 
-      // Cleanup map when component is unmounted
-      return () => {
-        if (map) {
-          map.remove();
+      // Add the line layer
+      map.addLayer({
+        id: 'route',
+        type: 'line',
+        source: 'route',
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        paint: {
+          'line-color': transport.lineColor,
+          'line-width': 4,
+          'line-dasharray': transport.dashArray
         }
-      };
-    }
-  }, [lat, lon]);
+      });
+
+      // Add transport mode indicator at the middle point
+      const midIndex = Math.floor(cities.length / 2);
+      const midpoint = cities[midIndex].coordinates;
+
+      const el = document.createElement('div');
+      el.className = 'transport-marker';
+      el.innerHTML = transport.icon;
+
+      new mapboxgl.Marker(el)
+        .setLngLat(midpoint)
+        .setPopup(
+          new mapboxgl.Popup().setHTML(`
+            <div style="padding: 10px;">
+              <h3 style="margin: 0;">Route Info</h3>
+              <p style="margin: 5px 0;">Transport: ${vehicle}</p>
+              <p style="margin: 5px 0;">Distance: ${routeData.distance}</p>
+              <p style="margin: 5px 0;">Emissions: ${routeData.carbonEmission}</p>
+            </div>
+          `)
+        )
+        .addTo(map);
+
+      // Fit bounds to show all markers
+      const bounds = new mapboxgl.LngLatBounds();
+      cities.forEach(city => bounds.extend(city.coordinates));
+      
+      map.fitBounds(bounds, {
+        padding: 50
+      });
+    });
+
+    return () => map.remove();
+  }, [routeId]);
 
   return (
-    <>
-    <div className='d-flex justify-content-center '>
+    <div className="d-flex justify-content-center">
       <style>{`
         .mapBox {
-          width: 95%; /* Adjust the width for responsiveness */
-          height: 40vh; /* Adjust the height for responsiveness */
-          // margin: 1rem; /* Adjust the margin for spacing */
-          border-radius:1rem;
-          border: 1px solid rgba(0,0,0,0.5)
+          width: 100%;
+          height: 40vh;
+          border-radius: 1rem;
+          border: 1px solid rgba(0,0,0,0.5);
+        }
+
+        .transport-marker {
+          cursor: pointer;
+          font-size: 24px;
+          background-color: white;
+          border-radius: 50%;
+          padding: 5px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         @media (max-width: 768px) {
           .mapBox {
             width: 90%;
             height: 30vh;
-            border-radius:1rem;
+            border-radius: 1rem;
           }
         }
       `}</style>
-      <div id='map' className='mapBox' />
+      <div id="map" className="mapBox" />
     </div>
-    </>
   );
 }
 
