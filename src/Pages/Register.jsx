@@ -1,11 +1,11 @@
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-// import axiosInstance from "../axios";
-// import { MyContext } from "../Context/MyContext";
-// import image from "../Assets/register.jpg"
-// import { toast } from "react-toastify";
+import CreateAxiosInstance from "../Axios";
+import axios from "axios";
 
 const Register = () => {
+
+    const axiosInstance = CreateAxiosInstance()
 
     const { setLogin, setUid, setUser } = useState()
     const [staff, setStaff] = useState("baseUser")
@@ -21,43 +21,43 @@ const Register = () => {
     const navigate = useNavigate();
 
     const handleChange = (e) => {
-        // const { name, value } = e.target;
-        // setFormData({ ...formData, [name]: value });
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
     };
 
     const handleSave = async (e) => {
-        // e.preventDefault(); 
+        e.preventDefault(); 
 
-        // if (formData.password1 !== formData.password2) {
-        //   // toast.error("Passwords do not match");
-        //   return;
-        // }
+        if (formData.password1 !== formData.password2) {
+          // toast.error("Passwords do not match");
+          return;
+        }
 
-        // try {
-        //   const res = await axiosInstance.post( {
-        //     email: formData.email,
-        //     username: formData.username,
-        //     first_name: formData.first_name,
-        //     last_name: formData.last_name,
-        //     password: formData.password1,
-        //   });
-        //   console.log(res);
-        //   console.log("Registered successfully");
-        //   setLogin(true)
-        //   localStorage.setItem("access_token", res.data.access);
-        //   localStorage.setItem("refresh_token", res.data.refresh);
-        //   res.data.role === null ? setUser("undefined") : setUser(res.data.role);
-        //   res.data.role === null ? localStorage.setItem("role", "undefined") : localStorage.setItem("role", res.data.role)
-        //   axiosInstance.defaults.headers["Authorization"] =
-        //     "JWT " + localStorage.getItem("access_token");
-        //   console.log("Navigating");
-        //   setUser(res.data.role)
-        //   const decode = res.data.access
-        //   setUid(decode.user_id)
-        //   navigate("/");
-        // } catch (error) {
-        //   console.error("Error:", error);
-        // }
+        try {
+          const res = await axios.post( "http://127.0.0.1:8000/signup/", {
+            email: formData.email,
+            username: formData.username,
+            first_name: formData.first_name,
+            last_name: formData.last_name,
+            password: formData.password1,
+          });
+          console.log(res);
+          console.log("Registered successfully");
+          setLogin(true)
+          localStorage.setItem("access_token", res.data.access);
+          localStorage.setItem("refresh_token", res.data.refresh);
+          res.data.role === null ? setUser("undefined") : setUser(res.data.role);
+          res.data.role === null ? localStorage.setItem("role", "undefined") : localStorage.setItem("role", res.data.role)
+          axiosInstance.defaults.headers["Authorization"] =
+            "JWT " + localStorage.getItem("access_token");
+          console.log("Navigating");
+          setUser(res.data.role)
+          const decode = res.data.access
+          setUid(decode.user_id)
+          navigate("/");
+        } catch (error) {
+          console.error("Error:", error);
+        }
     };
 
     return (

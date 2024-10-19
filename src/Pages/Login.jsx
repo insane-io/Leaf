@@ -1,11 +1,13 @@
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-// import axiosInstance from "../axios";
+import CreateAxiosInstance from "../Axios";
 import { MyContext } from "../Context/MyContext"
+import axios from "axios";
 
 const Login = () => {
 
-  const { setLogin, setUser } = useContext(MyContext)
+  const { setLogin} = useContext(MyContext)
+  const axiosInstance = CreateAxiosInstance()
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
@@ -13,31 +15,28 @@ const Login = () => {
   });
 
   const handleChange = (e) => {
-    // const { name, value } = e.target;
-    // setFormData({ ...formData, [name]: value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
-    // e.preventDefault();
-    // const postData = new FormData();
-    // postData.append("email", formData.email);
-    // postData.append("password", formData.password);
+    e.preventDefault();
+    const postData = new FormData();
+    postData.append("email", formData.email);
+    postData.append("password", formData.password);
 
-    // try {
-    //   console.log(postData);
-    //   const res = await axiosInstance.post(`/authentication/login/`, postData);
-    //   localStorage.setItem("access_token", res.data.access);
-    //   localStorage.setItem("refresh_token", res.data.refresh);
-    //   localStorage.setItem("role", res.data.role);
-    //   axiosInstance.defaults.headers["Authorization"] =
-    //     "Bearer " + localStorage.getItem("access_token");
-    //   setLogin(true)
-    //   res.data.role === null ? setUser("undefined") :setUser(res.data.role);
-    //   res.data.role === null ? localStorage.setItem("role", "undefined") : localStorage.setItem("role", res.data.role)
-    //   navigate("/profile");
-    // } catch (error) {
-    //   console.error("Error:", error);
-    // }
+    try {
+      console.log(postData);
+      const res = await axios.post(`http://127.0.0.1:8000/login/`, postData);
+      localStorage.setItem("access_token", res.data.access);
+      localStorage.setItem("refresh_token", res.data.refresh);
+      axiosInstance.defaults.headers["Authorization"] =
+        "Bearer " + localStorage.getItem("access_token");
+      setLogin(true)
+      navigate("/");
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   return (

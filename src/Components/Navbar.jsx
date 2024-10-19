@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { MyContext } from "../Context/MyContext"
+import { h1 } from 'framer-motion/client';
 
 const links = [
   { name: "Home", path: "/", color: "#808080" },
@@ -12,8 +14,8 @@ const Navbar = () => {
   const [selected, setSelected] = useState(0);
   const [formerColor, setFormerColor] = useState(links[0].color);
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0); 
-  const isLoggedIn = !!localStorage.getItem("access_token");
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const { login } = useContext(MyContext)
 
   const handleScroll = () => {
     const currentScrollY = window.scrollY;
@@ -70,9 +72,16 @@ const Navbar = () => {
               />
             </svg>
           </button>
-          <Link to="/login" className="text-black px-4 py-2 border border-gray-300 rounded-lg font-normal text-lg hover:bg-gray-100">
-            Login
-          </Link>
+          {
+            login ? (
+              <h1>loggedIn</h1>
+            ) : (
+              <Link to="/login" className="text-black px-4 py-2 border border-gray-300 rounded-lg font-normal text-lg hover:bg-gray-100">
+                Login
+              </Link>
+            )
+          }
+
         </div>
         <div className={`items-center justify-between w-full md:flex md:w-auto md:order-1 ${isMenuOpen ? 'block' : 'hidden'}`} id="navbar-sticky">
           <ul className="md:gap-14 flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-transparent md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0">
