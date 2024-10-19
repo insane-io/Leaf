@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import axios from 'axios';
+import CreateAxiosInstance from "../Axios"
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoic29oYW0xMiIsImEiOiJjbG5mMThidXcwa2o4Mml0Y3IzMHh0ZzM1In0.NKrFUG12iisWBbf-TVp34g';
 
 function Map({ data, onCoordinateSelect }) {
+
+  const axiosInstance = CreateAxiosInstance()
   const [selectedCoordinates, setSelectedCoordinates] = useState(null);
   const [map, setMap] = useState(null);
 
@@ -32,6 +36,7 @@ function Map({ data, onCoordinateSelect }) {
     setMap(map);
 
     map.on('load', () => {
+      
       cityArray.forEach((city, index) => {
         const color = index === 0 ? '#00ff00' : index === cityArray.length - 1 ? '#ff0000' : '#ffa500';
 
@@ -42,25 +47,38 @@ function Map({ data, onCoordinateSelect }) {
         markerElement.style.height = '20px';
         markerElement.style.borderRadius = '50%';
 
+        const formData = new FormData();
+        formData.append('latitude', city.latitude);
+        formData.append('longitude', city.longitude);
+
         markerElement.addEventListener('click', () => {
           setSelectedCoordinates({ latitude: city.latitude, longitude: city.longitude });
           onCoordinateSelect?.({ latitude: city.latitude, longitude: city.longitude });
-        });
+
+          const res = axiosInstance.post('get_near_by_destination/', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }})
+          console.log(res.data)
+        }
+        );
+
 
         new mapboxgl.Marker(markerElement)
           .setLngLat([city.longitude, city.latitude])
           .setPopup(
             new mapboxgl.Popup().setHTML(`
-              <div style="padding: 10px;">
-                <h3 style="margin: 0;">City ${index + 1}</h3>
-                <p style="margin: 5px 0 0 0;">
-                  ${index === 0 ? 'Starting Point' : index === cityArray.length - 1 ? 'End Point' : 'Waypoint'}
-                </p>
-              </div>
-            `)
+        <div style="padding: 10px;">
+          <h3 style="margin: 0;">City ${index + 1}</h3>
+          <p style="margin: 5px 0 0 0;">
+            ${index === 0 ? 'Starting Point' : index === cityArray.length - 1 ? 'End Point' : 'Waypoint'}
+          </p>
+        </div>
+      `)
           )
           .addTo(map);
       });
+
 
       map.addSource('route', {
         type: 'geojson',
@@ -115,7 +133,7 @@ function Map({ data, onCoordinateSelect }) {
       map.fitBounds(bounds, { padding: 50 });
     });
 
-    
+
 
     return () => map.remove();
   }, [data]);
