@@ -35,6 +35,7 @@ const router = createBrowserRouter(
         <Route path='redeem' element={<Redeem/>} />
         <Route path='carbon-calculator' element={<Calculator/>} />
         <Route path='profile' element={<Profile/>} />
+        <Route path='planmap' element={<PlanMap/>} />
       </Route>
     </Route>
   )
