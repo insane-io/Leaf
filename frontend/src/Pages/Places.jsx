@@ -56,7 +56,7 @@ const Places = () => {
   };
 
   return (
-    <div className='mx-72'>
+    <div className='mx-72 mt-[3rem]'>
       <Carousal images={images} /> {/* Pass the images to Carousal */}
       <div className='flex justify-between mt-16'>
         <h1 className='text-4xl font-semibold my-3'>{place.name}</h1>

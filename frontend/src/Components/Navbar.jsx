@@ -9,7 +9,7 @@ const links = [
   { name: "Plan Your Trip", path: "/planmap" },
   { name: "Places", path: "/showplace" },
   { name: "Carbon Calculator", path: "/carbon-calculator" },
-  { name: "donation", path: "/donations" },
+  { name: "Donation", path: "/donations" },
   { name: "Redeem", path: "/redeem" },
   { name: "Profile", path: "/profile" },
 ];
