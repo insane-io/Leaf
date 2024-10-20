@@ -44,7 +44,7 @@ const Navbar = () => {
 
   const renderLink = (name, path, index) => (
     <motion.li key={name} onClick={() => handleLinkClick(index, "#808080")} style={{ position: "relative" }}>
-      <Link to={path} className="block py-2 px-3 rounded text-black" aria-current={index === selected ? "page" : undefined}>
+      <Link to={path} className="block py-2 px-3 rounded " aria-current={index === selected ? "page" : undefined}>
         {name}
         {index === selected && (
           <motion.div
@@ -58,6 +58,7 @@ const Navbar = () => {
               color: '#ffffff',
               backgroundColor: "#808080",
               opacity: 0.2,
+              border: "1px solid #ffffff",
             }}
             layoutId="selected"
             initial={{ backgroundColor: formerColor }}
@@ -70,7 +71,7 @@ const Navbar = () => {
   );
 
   return (
-    <nav className={`border-b bg-gray-200 font-bold text-lg fixed w-full z-20 top-0 start-0 transition-transform duration-300 ease-in-out ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+    <nav className={`border-b bg-[#008370] text-white font-bold text-lg fixed w-full z-20 top-0 start-0 transition-transform duration-300 ease-in-out ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-1">
         <div className="flex items-center space-x-3 rtl:space-x-reverse">
           <Link to="/">
@@ -93,7 +94,7 @@ const Navbar = () => {
           {login ? (
             <h1>loggedIn</h1>
           ) : (
-            <Link to="/login" className="text-black px-4 py-2 border border-gray-300 rounded-lg font-normal text-lg hover:bg-gray-100">
+            <Link to="/login" className=" px-4 py-2 border border-gray-300 rounded-lg font-normal text-lg hover:bg-gray-100">
               Login
             </Link>
           )}

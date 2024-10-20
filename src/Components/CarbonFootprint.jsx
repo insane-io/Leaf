@@ -74,14 +74,14 @@ function CarbonFootprintCalculator() {
   
 
   return (
-    <div className="col-span-1 mx-auto p-4 bg-white border-2 border-gray-400 rounded-lg">
+    <div className="col-span-1 mx-auto p-4 bg-white border-2 border-gray-400 rounded-2xl">
       <header className="text-center ">
-        <h1 className="text-2xl font-semibold text-gray-800">Calculate Your Travel Carbon Footprint</h1>
+        <h1 className="text-4xl font-semibold text-gray-800">Calculate Your Travel Carbon Footprint</h1>
         <p className="text-gray-600 mt-2 text-lg">Use our carbon footprint calculator to calculate your travel emissions</p>
       </header>
       <div className='flex flex-col'>
         <div className="bg-white p-6 rounded-lg">
-          <div className="flex justify-center w-full mb-6">
+          <div className="flex justify-center gap-2 w-full mb-6">
             <button
               className={`px-4 py-2 w-full flex items-center justify-center rounded-md ${tripType === 'flight' ? 'bg-[#d6ebe8] border-2 border-[#008370] text-[#008370]' : 'border-2 text-gray-700'}`}
               onClick={() => setTripType('flight')}>
@@ -158,18 +158,18 @@ function CarbonFootprintCalculator() {
               <button
                 type="button"
                 onClick={calculateFootprint}
-                className="bg-[#008370] text-white py-2 px-4 rounded-lg shadow-md hover:bg-green-600"
+                className="bg-[#008370] text-white w-2/5 text-xl font-medium py-2 px-4 rounded-lg shadow-md hover:bg-green-600"
               >
                 Calculate
               </button>
             </div>
           </form>
         </div>
-        <div className="p-6 rounded-lg text-center">
+        <div className="p-2 rounded-lg text-center">
           {emission && (
             <>
               <h2 className="text-2xl font-semibold mb-4">Your Carbon Footprint</h2>
-              <p className="text-gray-700 text2xl font-semibold">{emission}</p>
+              <p className="text-gray-700 text-4xl font-bold">{emission}</p>
             </>
           )
           }
