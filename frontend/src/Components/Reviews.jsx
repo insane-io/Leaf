@@ -19,7 +19,7 @@ const reviewsData = [
   // Add more reviews as needed
 ];
 
-const Reviews = () => {
+const Reviews = ({reviewsData}) => {
   return (
     <div className="p-6 space-y-4">
       {reviewsData.map((review) => (
@@ -32,7 +32,7 @@ const Reviews = () => {
           {/* Left - Circular Image */}
           <div className="flex-shrink-0">
             <img
-              src={review.personImage}
+              src={`https://api.dicebear.com/9.x/initials/svg?seed=${review.user.first_name}`} 
               alt={review.name}
               className="w-12 h-12 rounded-full object-cover"
             />
@@ -52,7 +52,7 @@ const Reviews = () => {
                 ))}
               </div>
             </div>
-            <p className="text-gray-600 mt-1">{review.description}</p>
+            <p className="text-gray-600 mt-1">{review.review}</p>
           </div>
         </motion.div>
       ))}

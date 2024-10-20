@@ -54,7 +54,7 @@ const Calculator = () => {
                     >
                         <h3 className="font-semibold text-3xl mb-2">Use Public Transport</h3>
                         <img
-                            src="https://via.placeholder.com/150" // Replace with your image URL
+                            src="https://wri-india.org/sites/default/files/styles/large/public/Five%20Ways%20to%20Promote%20Public%20Transport%20in%20Indian%20Cities-Blog.jpg?itok=CFDInE9K" // Replace with your image URL
                             alt="Public Transport"
                             className="mb-4 rounded w-full h-62 object-cover"
                         />
@@ -71,7 +71,7 @@ const Calculator = () => {
                     >
                         <h3 className="font-semibold text-3xl mb-2">Support Renewable Energy</h3>
                         <img
-                            src="https://via.placeholder.com/150" // Replace with your image URL
+                            src="https://media.licdn.com/dms/image/D5612AQGsiba_ua8qBw/article-cover_image-shrink_720_1280/0/1716994485940?e=2147483647&v=beta&t=OmYYDeaAtfHDsTsWK4g8LnpAx5yso86VM0kW7jPaaPM" // Replace with your image URL
                             alt="Renewable Energy"
                             className="mb-4 rounded w-full h-62 object-cover"
                         />
@@ -86,14 +86,14 @@ const Calculator = () => {
                         initial={{ scale: 0.95 }}
                         whileHover={{ scale: 1.05 }}
                     >
-                        <h3 className="font-semibold text-3xl mb-2">Reduce Meat Consumption</h3>
+                        <h3 className="font-semibold text-3xl mb-2">Reduce, reuse, and recycle</h3>
                         <img
-                            src="https://via.placeholder.com/150" // Replace with your image URL
-                            alt="Reduce Meat Consumption"
+                            src="https://innovation-yachts.com/wp-content/uploads/2024/06/3R-reduce-reuse-recycle_s.jpg" // Replace with your image URL
+                            alt="Reduce, reuse, and recycle"
                             className="mb-4 rounded w-full h-62 object-cover"
                         />
                         <p className="text-gray-600">
-                            Lower your meat intake to decrease the environmental impact of livestock farming.
+                            Recycling and reusing materials reduces the amount of waste that ends up in landfills, incinerators, or oceans, where they pollute the environment and emit greenhouse gases
                         </p>
                     </motion.div>
                 </div>

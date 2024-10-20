@@ -71,7 +71,7 @@ const Navbar = () => {
   );
 
   return (
-    <nav className={`border-b bg-[#008370] text-white font-bold text-lg fixed w-full z-20 top-0 start-0 transition-transform duration-300 ease-in-out ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+    <nav className={`p-2 border-b bg-[#008370] text-white font-bold text-lg fixed w-full z-20 top-0 start-0 transition-transform duration-300 ease-in-out ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-1">
         <div className="flex items-center space-x-3 rtl:space-x-reverse">
           <Link to="/">
