@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import CreateAxiosInstance from '../Axios';
 
 const donationOptions = [
   { id: 1, name: 'Tree Planting', description: 'Plant trees to absorb CO2 and improve air quality.', amount: 20 },
@@ -8,41 +9,74 @@ const donationOptions = [
 ];
 
 const Donations = () => {
+  const axiosInstance = CreateAxiosInstance(); // Move axiosInstance creation outside of handleDonate
   const [selectedOption, setSelectedOption] = useState(null);
   const [donationAmount, setDonationAmount] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [user, setUser] = useState();
 
-  const handleDonate = () => {
+  useEffect(() => {
+    async function getData() {
+      try {
+        const res = await axiosInstance.get('profile/');
+        console.log(res.data);
+        setUser(res.data.user.first_name);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getData();
+  }, [axiosInstance]);
+
+  const handleDonate = async () => {
     if (!selectedOption || !donationAmount) {
       alert('Please select a donation option and enter an amount.');
       return;
     }
-
+  
     const options = {
-      key: 'rzp_test_g1hNEV9xyquwrL', // Replace with your Razorpay API key
-      amount: (donationAmount * 100).toString(), // Amount is in smallest currency unit (paise for INR)
+      key: 'rzp_test_g1hNEV9xyquwrL', 
+      amount: (donationAmount * 100).toString(), 
       currency: 'INR',
       name: 'Green Donation',
       description: `Donation for ${selectedOption.name}`,
-      handler: (response) => {
+      handler: async (response) => {
         console.log('Payment Response:', response);
-        setSuccessMessage(`Thank you for your donation of ₹${donationAmount} towards ${selectedOption.name}! Your support helps reduce carbon emissions!`);
+        const paymentId = response.razorpay_payment_id;
+        const formData = {
+          name: user, // User's name from state
+          amount: donationAmount,
+          paymentId: paymentId,
+          donationType: selectedOption.name,
+          message: `Thank you ${user} for your donation of ₹${donationAmount} towards ${selectedOption.name}! Your support helps reduce carbon emissions!`
+        };
+  
+        try {
+          // Post the form data to the server
+          const res = await axiosInstance.post('donations/', formData);
+          console.log('Donation successfully recorded:', res.data);
+          setSuccessMessage(formData.message);
+        } catch (error) {
+          console.error('Error posting donation data:', error);
+        }
+  
         setDonationAmount('');
         setSelectedOption(null);
       },
       prefill: {
-        name: 'Your Name',
-        email: 'email@example.com',
+        name: user, // Using the user's name fetched from the profile
+        email: 'email@example.com', 
         contact: '1234567890',
       },
       theme: {
         color: '#3399cc',
       },
     };
-
+  
     const rzp1 = new window.Razorpay(options);
     rzp1.open();
   };
+  
 
   return (
     <div className="mx-8 my-10">
@@ -50,7 +84,7 @@ const Donations = () => {
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-2">Choose Your Donation to Combat Climate Change</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {donationOptions.map(option => (
+          {donationOptions.map((option) => (
             <div
               key={option.id}
               className={`p-4 border rounded-lg cursor-pointer ${selectedOption?.id === option.id ? 'border-green-500 bg-green-100' : 'border-gray-300'}`}

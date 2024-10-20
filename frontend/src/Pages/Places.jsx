@@ -21,6 +21,7 @@ const Places = () => {
   const [rating, setRating] = useState(0)
   const [hover, setHover] = useState(0)
   const [flag, setFlag] = useState(true)
+  
   useEffect(() => {
     async function fetchPlace() {
       try {
