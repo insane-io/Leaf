@@ -11,6 +11,12 @@ import TourGuider from './Pages/TourGuider';
 import Listplace from './Pages/Listplace';
 import Login from './Pages/Login';
 import Register from './Pages/Register';
+import Places from './Pages/Places';
+import Donations from './Pages/Donations';
+import Showplace from './Pages/Showplace';
+import Redeem from './Pages/Redeem';
+
+
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -22,6 +28,10 @@ const router = createBrowserRouter(
         <Route path='dashboard' element={<DashBoard/>} />
         <Route path='login' element={<Login/>} />
         <Route path='register' element={<Register/>} />
+        <Route path='place/:id' element={<Places/>} />
+        <Route path='donations' element={<Donations/>} />
+        <Route path='showplace' element={<Showplace/>} />
+        <Route path='redeem' element={<Redeem/>} />
       </Route>
     </Route>
   )
