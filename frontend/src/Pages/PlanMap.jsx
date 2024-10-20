@@ -279,9 +279,11 @@ const RouteSearch = () => {
                         </p>
                         {/* <a href={hoteldata.website} target="_blank">Visit Website</a> */}
                         <div className="flex justify-center m-2">
-                            <button className="bg-cyan-300 p-3 font-bold text-xl rounded" onClick={()=>{navigate(`/place/${hoteldata.id}`)}
-                            }>Click here for Booking</button>
                             </div>
+                            <div className="flex justify-center m-2">
+                            <button className="bg-[#088474] text-white p-3 font-bold text-xl rounded" onClick={() => { navigate(`/place/${hoteldata.id}`) }
+                            }>Click here for Booking</button>
+                        </div>
                         <h1 className="text-xl">Reviews</h1>
                         <Reviews reviews={hoteldata.reviews}/>
                     </div>

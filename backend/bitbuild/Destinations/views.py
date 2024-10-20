@@ -39,12 +39,16 @@ def configure_genai():
 class CalculateCarbonEmissions(View):
 
     def post(self, request):
+        print(request.body)
         data = request.POST
         current_location = data.get('current_location')
         destination = data.get('destination')
 
         if not current_location or not destination:
-            return JsonResponse({'error': 'Current location and destination are required.'}, status=400)
+            data = json.loads(request.body)
+            current_location = data.get('current_location')
+            destination = data.get('destination')
+            # return JsonResponse({'error': 'Current location and destination are required.'}, status=400)
 
         try:
             # Call Gemini API to get routes
@@ -60,8 +64,8 @@ class CalculateCarbonEmissions(View):
             #         'carbon_emission': carbon_emission
             #     })
             gemini_classes = GeminiApi(
-                current_location = request.POST.get('current_location'),
-                destination = request.POST.get('destination')
+                current_location = current_location,
+                destination = destination
             )
             distances = gemini_classes.generate_routes()
             return JsonResponse({'routes': distances}, status=200)
@@ -198,20 +202,58 @@ class GeminiApi:
         return routes
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
-def get_place(request):
+@permission_classes([AllowAny])  # Allow any user to access this endpoint
+def get_or_filter_places(request):
     place_id = request.GET.get('id')
+    queryset = Location.objects.all()
+
     if place_id:
         try:
-            location = Location.objects.get(id=place_id)
+            location = queryset.get(id=place_id)
             serializer = GetLocationSerializer(location)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Location.DoesNotExist:
             return Response({"detail": "Location not found."}, status=status.HTTP_404_NOT_FOUND)
-    else:
-        locations = Location.objects.all()
-        serializer = GetLocationSerializer(locations, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK) 
+
+    # Get query parameters from the request for filtering
+    name = request.GET.get('name', None)
+    city = request.GET.get('city', None)
+    rating = request.GET.get('rating', None)
+    min_rating = request.GET.get('min_rating', None)
+    max_rating = request.GET.get('max_rating', None)
+    min_price = request.GET.get('min_price', None)
+    max_price = request.GET.get('max_price', None)
+
+    # Apply filters if query parameters are provided
+    if name:
+        queryset = queryset.filter(name__icontains=name)  # Case-insensitive contains
+    if city:
+        queryset = queryset.filter(city__icontains=city)  # Case-insensitive contains
+    if rating:
+        queryset = queryset.filter(rating=rating)  # Exact rating match
+    if min_rating:
+        queryset = queryset.filter(rating__gte=int(min_rating))  # Greater than or equal to min_rating
+    if max_rating:
+        queryset = queryset.filter(rating__lte=int(max_rating))  # Less than or equal to max_rating
+
+    # Filter based on price range
+    if min_price or max_price:
+        def extract_price(price_string):
+            return int(re.sub(r'[^\d]', '', price_string))  # Remove non-numeric characters and convert to int
+
+        filtered_queryset = []
+        for location in queryset:
+            if location.price_range:
+                price = extract_price(location.price_range)
+                if min_price and price < int(min_price):
+                    continue
+                if max_price and price > int(max_price):
+                    continue
+                filtered_queryset.append(location)
+        queryset = filtered_queryset
+
+    serializer = GetLocationSerializer(queryset, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -271,6 +313,165 @@ def create_location(request):
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+from .serializers import BookingSerializer
+from django.db import transaction as db_transaction
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def booking_list(request):
+    user = request.user
+    pro = Profile.objects.get(user=user)
+    bookings = Bookings.objects.filter(user=pro)
+    serializer = GetBookingSerializer(bookings, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_product(request):
+    try:
+        product_id = request.GET.get('product_id')
+        if product_id:
+            product = Product.objects.get(id=product_id)
+            serializer = ProductSerializer(product)
+            return Response(serializer.data, status=200)
+        else:
+            products = Product.objects.all()
+            serializer = ProductSerializer(products, many=True)
+            return Response(serializer.data, status=200)
+
+    except Product.DoesNotExist:
+        return Response({'error': 'Product not found.'}, status=404)
+
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_transaction(request):
+    user = request.user
+
+    try:
+        # Attempt to get the user's profile
+        profile = Profile.objects.get(user=user)
+    except Profile.DoesNotExist:
+        return Response({'error': 'Profile not found.'}, status=404)
+
+    try:
+        # Fetch the user's transactions
+        transactions = Transaction.objects.filter(user=profile)
+        if not transactions.exists():
+            return Response({'message': 'No transactions found for this user.'}, status=404)
+
+        serializer = TransactionSerializer(transactions, many=True)
+        return Response(serializer.data, status=200)
+
+    except Exception as e:
+        # Catch any other exceptions and return a server error response
+        return Response({'error': str(e)}, status=500)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def redeem_coupon(request):
+    user = request.user
+    pro_id = request.data.get('pro_id')
+
+    try:
+        coupon = Product.objects.get(id=pro_id)
+    except Product.DoesNotExist:
+        return Response({'error': 'Invalid or expired coupon code.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    profile = Profile.objects.get(user=user)
+
+    # Update user's credit balance
+    balance_before = profile.credit_coins
+    profile.credit_coins -= coupon.worth
+    profile.save()
+
+    # Create transaction record
+    Transaction.objects.create(
+        user=profile,
+        transaction_type='0',  # Credit transaction
+        amount=coupon.worth,
+        balance_before=balance_before,
+        balance_after=profile.credit_coins,
+        description=f'Redeemed coupon: {coupon.title}, Added {coupon.worth} credits.'
+    )
+
+    coupon.save()
+
+    return Response({'message': 'Coupon redeemed successfully.', 'new_balance': profile.credit_coins}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def donation(request):
+    user = request.user
+    profile = Profile.objects.get(user=user)
+    payment_id = request.data.get('payment_id')
+    place_id = request.data.get('place_id')
+    message = request.data.get('message')
+    amount = request.data.get('amount')
+
+    Transaction.objects.create(
+        user=profile,
+        transaction_type='2',
+        amount=amount,
+        balance_before=profile.credit_coins,
+        balance_after=profile.credit_coins,
+        payment_id=payment_id, 
+        description=message,
+    )
+
+    return Response({'message': 'Coupon redeemed successfully.', 'new_balance': profile.credit_coins}, status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_booking(request):
+    user = request.user
+    carbon_footprint = request.data.get('carbon_footprint')
+    price = request.data.get('price')
+    place_id = request.data.get('place_id')
+
+    if carbon_footprint is None or price is None or place_id is None:
+        return Response({'error': 'carbon_footprint, price, and place_id are required fields.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        profile = Profile.objects.get(user=user)
+    except Profile.DoesNotExist:
+        return Response({'error': 'Profile not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    mutable_data = request.data.copy()
+    mutable_data['place'] = place_id
+    mutable_data['user'] = profile.id
+    mutable_data['price'] = price
+
+    with db_transaction.atomic():
+        serializer = BookingSerializer(data=mutable_data)
+        if serializer.is_valid():
+            booking = serializer.save()
+
+            credits_to_add = calculate_credits(int(carbon_footprint))
+            Transaction.objects.create(
+                user=profile,
+                transaction_type='1',
+                amount=credits_to_add,
+                balance_before=profile.credit_coins,
+                balance_after=profile.credit_coins + credits_to_add,
+                description=f'Added {credits_to_add} credits for booking with carbon footprint {carbon_footprint}.'
+            )
+            profile.credit_coins += credits_to_add
+            profile.save()
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+def calculate_credits(carbon_footprint):
+    if carbon_footprint < 100:
+        return carbon_footprint * 3
+    elif carbon_footprint < 200:
+        return carbon_footprint * 2
+    else:
+        return carbon_footprint * 0.5
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -279,12 +480,14 @@ def review_view(request):
         user = request.user
         profile = Profile.objects.get(user=user)
         place_id = request.data.get('place_id')
+        review = request.data.get('review')
         if not place_id:
             return Response({'error': 'Place ID is required'}, status=status.HTTP_400_BAD_REQUEST)
         # places = Places.objects.get(id=place_id)
         mutable_data = request.data.copy()
         mutable_data['place'] = place_id 
         mutable_data['user'] = profile.id
+        mutable_data['review'] = review
         # print(mutable_data)
         serializer = ReviewSerializer(data=mutable_data)
         if serializer.is_valid():
@@ -292,7 +495,6 @@ def review_view(request):
             rating_avg = Reviews.objects.filter(place=place_id).aggregate(Avg('rating'))['rating__avg']
             place = Location.objects.get(id=place_id)
             place.rating = rating_avg if rating_avg is not None else 0
-            place.total_reviews = Reviews.objects.filter(place=place_id).count()
             place.save()
             # print(serializer.data)
             return Response({'message': 'Review saved successfully'}, status=status.HTTP_201_CREATED) 
@@ -321,62 +523,18 @@ def get_reviews(request):
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def filter_places(request):
-    queryset = Location.objects.all()
-    
-    # Get query parameters from the request
-    name = request.GET.get('name', None)
-    city = request.GET.get('city', None)
-    rating = request.GET.get('rating', None)
-    min_rating = request.GET.get('min_rating', None)
-    max_rating = request.GET.get('max_rating', None)
-    min_price = request.GET.get('min_price', None)
-    max_price = request.GET.get('max_price', None)
-
-    # Apply filters if query parameters are provided
-    if name:
-        queryset = queryset.filter(name__icontains=name)  # Case-insensitive contains
-    if city:
-        queryset = queryset.filter(city__icontains=city)  # Case-insensitive contains
-    if rating:
-        queryset = queryset.filter(rating=rating)  # Exact rating match
-    if min_rating:
-        queryset = queryset.filter(rating__gte=0)  # Greater than or equal to min_rating
-    if max_rating:
-        queryset = queryset.filter(rating__lte=5)  # Less than or equal to max_rating
-
-    # Filter based on price range
-    if min_price or max_price:
-        # Convert price range from strings like '59,000 Rupees' to integers
-        def extract_price(price_string):
-            return int(re.sub(r'[^\d]', '', price_string))  # Remove non-numeric characters and convert to int
-        
-        filtered_queryset = []
-        for location in queryset:
-            if location.price_range:
-                price = extract_price(location.price_range)
-                if min_price and price < int(min_price):
-                    continue
-                if max_price and price > int(max_price):
-                    continue
-                filtered_queryset.append(location)
-        queryset = filtered_queryset
-    serializer = GetLocationSerializer(queryset, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def get_near_by_destination(request):
     try:
         # Load coordinates from request body
-        coordinates = request.POST.get('coordinates')
-        if isinstance(coordinates, str):
-            coordinates = json.loads(coordinates)
+        coordinates = request.data
+        # if isinstance(coordinates, str):
+        #     coordinates = json.loads(coordinates)
+        print(coordinates)
 
-        latitude = coordinates.get('latitude')
-        longitude = coordinates.get('longitude')
+        latitude = float(coordinates.get('latitude'))
+        longitude = float(coordinates.get('longitude'))
 
         # Ensure latitude and longitude are provided
         if latitude is None or longitude is None:

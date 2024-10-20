@@ -123,7 +123,7 @@ const Profile = () => {
                     <h2 className="text-left text-2xl font-bold text-[#0A9D50]">Transaction History</h2>
                     <hr className="border-t-[1px] border-gray-300 w-full mb-6" />
 
-                    {transactions.map((transaction) => (
+                    {[...transactions].reverse().map((transaction) => (
                         <div key={transaction.id} className={`p-4 my-2 rounded-lg ${getTransactionColor(transaction.transaction_type)}`}>
                             <div className="flex justify-between">
                                 <span className='text-xl font-semibold'>{transaction.description}</span>

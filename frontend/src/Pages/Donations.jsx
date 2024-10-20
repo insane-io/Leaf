@@ -44,16 +44,13 @@ const Donations = () => {
         console.log('Payment Response:', response);
         const paymentId = response.razorpay_payment_id;
         const formData = {
-          name: user, // User's name from state
           amount: donationAmount,
-          paymentId: paymentId,
-          donationType: selectedOption.name,
+          payment_id: paymentId,
           message: `Thank you ${user} for your donation of ₹${donationAmount} towards ${selectedOption.name}! Your support helps reduce carbon emissions!`
         };
   
         try {
-          // Post the form data to the server
-          const res = await axiosInstance.post('donations/', formData);
+          const res = await axiosInstance.post('donation/', formData);
           console.log('Donation successfully recorded:', res.data);
           setSuccessMessage(formData.message);
         } catch (error) {
