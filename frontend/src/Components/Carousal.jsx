@@ -10,7 +10,7 @@ export default function App({images}) {
       <Swiper navigation={true} modules={[Navigation]} className="mySwiper">
       {
       images.map((d)=>(
-        <SwiperSlide><img src={`${d}`} alt="" className='h-[30rem] w-full'/></SwiperSlide>
+        <SwiperSlide><img src={`${d}`} alt="" className='h-[40rem] w-full'/></SwiperSlide>
       ))
     }
       </Swiper>
