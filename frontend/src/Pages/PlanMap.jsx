@@ -9,12 +9,25 @@ const RouteSearch = () => {
     const [maps, setMaps] = useState({})
     const [data, setData] = useState({})
     const [openbox, setOpenbox] = useState(false)
-
+    const [showhoteldata, setShowHotelData] = useState(false)
+    const [hoteldata, setHOtelData] = useState({})
+    const handleGoBack = () => {
+        setOpenbox(false)
+        setShowHotelData(false)
+        setHOtelData({})
+    }
     const axiosInstance = CreateaxiosInstance();
 
     const handleClick = (i) => {
         setMaps(data.routes[i])
+        setShowHotelData(false)
         setOpenbox(true)
+    }
+    const handleDestination = (data) => {
+        setOpenbox(true)
+        setShowHotelData(true)
+        setHOtelData(data)
+        console.log(data, "======>")
     }
 
     const handleSearch = async () => {
@@ -131,7 +144,7 @@ const RouteSearch = () => {
     };
 
     return (
-        <div className="relative w-full">
+        <div className="relative w-full mt-[3rem] pl-2 pr-2">
             <style>{`.loader {
             border: 8px solid #f3f3f3; /* Light gray */
             border-top: 8px solid #3498db; /* Blue */
@@ -214,12 +227,61 @@ const RouteSearch = () => {
                     )}
                 </div>
                 )}
-                {openbox && (<div className="overflow-y-auto ">
+                {openbox && showhoteldata && (<div className="overflow-y-auto ">
+                    <button onClick={handleGoBack}>
+                    &#8592; Go Back
+                    </button>
+                    <div style={{ padding: '10px' }}>
+                        <h3 style={{ margin: 0 }}>{hoteldata.name}</h3>
+                        <p style={{ margin: '5px 0 0 0' }}>{hoteldata.description}</p>
+                        <p>
+                            <b>City:</b> {hoteldata.city}, <b>Country:</b> {hoteldata.country}
+                        </p>
+                        <p>
+                            <b>Rating:</b> {hoteldata.rating}
+                        </p>
+                        <p>
+                            <b>Price Range:</b> {hoteldata.price_range}
+                        </p>
+                        <p>
+                            <b>Phone:</b> {hoteldata.phone_number}
+                        </p>
+                        {/* <a href={hoteldata.website} target="_blank">Visit Website</a> */}
+                    </div>
 
                 </div>)}
+                {
+                    openbox && !showhoteldata && (<div
+                        className="border p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow bg-gray-50"
+                    >
+                        <div className="space-y-2">
+                            <h3 className="font-semibold text-lg">Route</h3>
+                            <p className="text-gray-700">
+                                <span className="font-medium">Path:</span> {maps.route.replace('- ', '')}
+                            </p>
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                                <p>
+                                    <span className="font-medium">Distance:</span> {maps.distance}
+                                </p>
+                                <p>
+                                    <span className="font-medium">Vehicle:</span> {maps.vehicle}
+                                </p>
+                                <p>
+                                    <span className="font-medium">Carbon Footprint:</span> {maps.carbon_footprint}
+                                </p>
+                                <p>
+                                    <span className="font-medium">Carbon Emission:</span> {maps.carbon_emission}
+                                </p>
+                                <p>
+                                    <span className="font-medium">Est. Cost:</span> ₹{maps.estimated_cost}
+                                </p>
+                            </div>
+                        </div>
+                    </div>)
+                }
 
             </div>
-            <NewMaps data={maps} />
+            <NewMaps data={maps} handleDestination={handleDestination} />
         </div>
 
     );

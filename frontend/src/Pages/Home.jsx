@@ -86,10 +86,7 @@ const Home = () => {
           <h2 className="text-xl font-light text-white ">
             Step Into the Green, Leave Stress Behind
           </h2>
-
-          {/* Search Bar */}
-          <div className="w-full max-w-6xl mt-24 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4 bg-white p-2 rounded-lg shadow-lg">
-            {/* Source Input */}
+          {/* <div className="w-full max-w-6xl mt-24 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4 bg-white p-2 rounded-lg shadow-lg">
             <div className="flex items-center flex-1   rounded-lg p-1">
               <FaMapMarkerAlt className="text-gray-500 ml-2" />
               <input
@@ -98,7 +95,6 @@ const Home = () => {
                 className="flex-1 p-1 focus:outline-none ml-2"
               />
             </div>
-            {/* Destination Input */}
             <div className="flex items-center flex-1  rounded-lg p-1">
               <FaRoute className="text-gray-500 ml-2" />
               <input
@@ -107,7 +103,6 @@ const Home = () => {
                 className="flex-1 p-1 focus:outline-none ml-2"
               />
             </div>
-            {/* Date Picker Input */}
             <div className="flex items-center flex-1 border border-gray-300 rounded-lg p-1">
               <FaCalendarAlt className="text-gray-500 ml-2" />
               <DatePicker
@@ -118,11 +113,10 @@ const Home = () => {
                 dateFormat="dd/MM/yyyy"
               />
             </div>
-            {/* Search Button */}
             <button className="p-2 bg-[#008370] text-white font-bold rounded-lg w-full md:w-auto">
               Search
             </button>
-          </div>
+          </div> */}
         </div>
         <div className="grid grid-cols-3 gap-4 mt-24">
           {/* Left Column */}
@@ -137,7 +131,7 @@ const Home = () => {
             <p className="text-lg text-gray-700 mb-6">
               Plan and book eco-friendly travel experiences without compromising on convenience or adventure.
             </p>
-            <button className="bg-[#008370] text-white py-2 px-6 rounded-full text-lg font-semibold">Plan Your Trip</button>
+            <button onClick={navigate('/planmap')} className="bg-[#008370] text-white py-2 px-6 rounded-full text-lg font-semibold">Plan Your Trip</button>
           </div>
         </div>
         <div className='mt-16 bg-gray-300 m-24 rounded-2xl  '>

@@ -6,10 +6,11 @@ import CreateAxiosInstance from "../Axios";
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoic29oYW0xMiIsImEiOiJjbG5mMThidXcwa2o4Mml0Y3IzMHh0ZzM1In0.NKrFUG12iisWBbf-TVp34g';
 
-function NewMaps({ data, onCoordinateSelect }) {
+function NewMaps({ data, onCoordinateSelect, handleDestination}) {
   const axiosInstance = CreateAxiosInstance();
   const [selectedCoordinates, setSelectedCoordinates] = useState(null);
   const [map, setMap] = useState(null);
+  const [selectedMarkerData, setSelectedMarkerData] = useState(null);
 
   const transportConfig = {
     Car: { icon: '🚗', lineColor: '#3498db', dashArray: [1] },
@@ -19,22 +20,20 @@ function NewMaps({ data, onCoordinateSelect }) {
   };
 
   useEffect(() => {
-    // Create map instance
-    const map = new mapboxgl.Map({
+    // Initialize map
+    const newMap = new mapboxgl.Map({
       style: 'mapbox://styles/mapbox/light-v11',
-      center: [72.8777, 19.076], // Default center (e.g., Mumbai)
+      center: [72.8777, 19.076], // Default center (Mumbai)
       zoom: 5,
       container: 'map',
       antialias: true
     });
 
-    setMap(map);
+    setMap(newMap);
 
     // Load the map and add markers/routes if data exists
-    map.on('load', () => {
-      if (!data || !data.latitude_longitude) {
-        return; // Exit early if data is empty
-      }
+    newMap.on('load', () => {
+      if (!data || !data.latitude_longitude) return;
 
       const cityArray = Object.values(data.latitude_longitude);
       const transport = transportConfig[data.vehicle] || transportConfig['Car'];
@@ -53,13 +52,51 @@ function NewMaps({ data, onCoordinateSelect }) {
         formData.append('latitude', city.latitude);
         formData.append('longitude', city.longitude);
 
-        markerElement.addEventListener('click', () => {
+        markerElement.addEventListener('click', async () => {
           setSelectedCoordinates({ latitude: city.latitude, longitude: city.longitude });
           onCoordinateSelect?.({ latitude: city.latitude, longitude: city.longitude });
 
-          axiosInstance.post('get_near_by_destination/', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-          }).then(res => console.log(res.data));
+          try {
+            const res = await axiosInstance.post('get_near_by_destination/', formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              }
+            });
+
+            if (Array.isArray(res.data)) {
+              res.data.forEach((data1) => {
+                console.log(data1.longitude, data1.latitude)
+                // Create a new marker for each destination
+                const newMarkerElement = document.createElement('div');
+                newMarkerElement.className = 'marker';
+                newMarkerElement.style.backgroundColor = '#ffa500';
+                newMarkerElement.style.width = '20px';
+                newMarkerElement.style.height = '20px';
+                newMarkerElement.style.borderRadius = '50%';
+                
+                newMarkerElement.addEventListener('click', () => {
+                    // Update state with the data of the clicked marker
+                    setSelectedMarkerData(data1);
+                    handleDestination(data1)
+                    console.log("success")
+                  });
+                new mapboxgl.Marker(newMarkerElement)
+                  .setLngLat([data1.longitude, data1.latitude])
+                  .setPopup(
+                    new mapboxgl.Popup().setHTML(`
+                      <div style="padding: 10px;">
+                        <h3 style="margin: 0;">${data1.name}</h3>
+                      </div>
+                    `)
+                  )
+                  .addTo(newMap);
+              });
+            } else {
+              console.error('Unexpected data format. Expected an array.');
+            }
+          } catch (error) {
+            console.error('Error fetching nearby destinations:', error);
+          }
         });
 
         new mapboxgl.Marker(markerElement)
@@ -74,10 +111,11 @@ function NewMaps({ data, onCoordinateSelect }) {
               </div>
             `)
           )
-          .addTo(map);
+          .addTo(newMap);
       });
 
-      map.addSource('route', {
+      // Adding a route line
+      newMap.addSource('route', {
         type: 'geojson',
         data: {
           type: 'Feature',
@@ -89,7 +127,7 @@ function NewMaps({ data, onCoordinateSelect }) {
         }
       });
 
-      map.addLayer({
+      newMap.addLayer({
         id: 'route',
         type: 'line',
         source: 'route',
@@ -104,6 +142,7 @@ function NewMaps({ data, onCoordinateSelect }) {
         }
       });
 
+      // Adding transport icon marker at midpoint
       const midIndex = Math.floor(cityArray.length / 2);
       const midpoint = [cityArray[midIndex].longitude, cityArray[midIndex].latitude];
 
@@ -123,22 +162,23 @@ function NewMaps({ data, onCoordinateSelect }) {
             </div>
           `)
         )
-        .addTo(map);
+        .addTo(newMap);
 
+      // Fit map to bounds
       const bounds = new mapboxgl.LngLatBounds();
       cityArray.forEach(city => bounds.extend([city.longitude, city.latitude]));
-      map.fitBounds(bounds, { padding: 50 });
+      newMap.fitBounds(bounds, { padding: 50 });
     });
 
-    return () => map.remove();
-  }, [data]);
+    return () => newMap.remove(); // Cleanup on component unmount
+  }, [data, axiosInstance, onCoordinateSelect]);
 
   return (
     <div className="d-flex justify-content-center">
       <style>{`
         .mapBox {
           width: 100%;
-          height: 85vh;
+          height: 90vh;
           border-radius: 1rem;
           border: 1px solid rgba(0,0,0,0.5);
         }
@@ -161,7 +201,6 @@ function NewMaps({ data, onCoordinateSelect }) {
       <div id="map" className="mapBox" />
       {selectedCoordinates && (
         <div className="selected-coordinates">
-          Selected: Lat {selectedCoordinates.latitude}, Lng {selectedCoordinates.longitude}
         </div>
       )}
     </div>
