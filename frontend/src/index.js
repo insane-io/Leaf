@@ -17,8 +17,7 @@ import Showplace from './Pages/Showplace';
 import Redeem from './Pages/Redeem';
 import Calculator from './Pages/Calculator';
 import Profile from './Pages/Profile';
-
-
+import PlanMap from './Pages/PlanMap';
 
 const router = createBrowserRouter(
   createRoutesFromElements(

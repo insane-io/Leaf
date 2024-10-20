@@ -2,13 +2,12 @@ import React, { useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import axios from 'axios';
-import CreateAxiosInstance from "../Axios"
+import CreateAxiosInstance from "../Axios";
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoic29oYW0xMiIsImEiOiJjbG5mMThidXcwa2o4Mml0Y3IzMHh0ZzM1In0.NKrFUG12iisWBbf-TVp34g';
 
-function Map({ data, onCoordinateSelect }) {
-
-  const axiosInstance = CreateAxiosInstance()
+function NewMaps({ data, onCoordinateSelect }) {
+  const axiosInstance = CreateAxiosInstance();
   const [selectedCoordinates, setSelectedCoordinates] = useState(null);
   const [map, setMap] = useState(null);
 
@@ -20,14 +19,10 @@ function Map({ data, onCoordinateSelect }) {
   };
 
   useEffect(() => {
-    if (!data || !data.latitude_longitude) return;
-
-    const cityArray = Object.values(data.latitude_longitude);
-    const transport = transportConfig[data.vehicle] || transportConfig['Car'];
-
+    // Create map instance
     const map = new mapboxgl.Map({
       style: 'mapbox://styles/mapbox/light-v11',
-      center: cityArray[0] ? [cityArray[0].longitude, cityArray[0].latitude] : [72.8777, 19.076],
+      center: [72.8777, 19.076], // Default center (e.g., Mumbai)
       zoom: 5,
       container: 'map',
       antialias: true
@@ -35,8 +30,15 @@ function Map({ data, onCoordinateSelect }) {
 
     setMap(map);
 
+    // Load the map and add markers/routes if data exists
     map.on('load', () => {
-      
+      if (!data || !data.latitude_longitude) {
+        return; // Exit early if data is empty
+      }
+
+      const cityArray = Object.values(data.latitude_longitude);
+      const transport = transportConfig[data.vehicle] || transportConfig['Car'];
+
       cityArray.forEach((city, index) => {
         const color = index === 0 ? '#00ff00' : index === cityArray.length - 1 ? '#ff0000' : '#ffa500';
 
@@ -51,71 +53,29 @@ function Map({ data, onCoordinateSelect }) {
         formData.append('latitude', city.latitude);
         formData.append('longitude', city.longitude);
 
-        markerElement.addEventListener('click', async () => {
+        markerElement.addEventListener('click', () => {
           setSelectedCoordinates({ latitude: city.latitude, longitude: city.longitude });
           onCoordinateSelect?.({ latitude: city.latitude, longitude: city.longitude });
-        
-          try {
-            const res = await axiosInstance.post('get_near_by_destination/', formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-              }
-            });
-        
-            console.log(res.data);
-        
-            // Assuming res.data is an object and not an array
-            const data1 = res.data;
-            console.log(data1.longitude, data1.latitude)
-            // Create a new marker element for the response data
-            const newMarkerElement = document.createElement('div');
-            newMarkerElement.className = 'marker';
-            newMarkerElement.style.backgroundColor = '#ffa500'; // Set a color for the new markers
-            newMarkerElement.style.width = '20px';
-            newMarkerElement.style.height = '20px';
-            newMarkerElement.style.borderRadius = '50%';
-        
-            // Add marker for the response data location
-            new mapboxgl.Marker(newMarkerElement)
-              .setLngLat([data1.longitude, data1.latitude])
-              .setPopup(
-                new mapboxgl.Popup().setHTML(`
-                  <div style="padding: 10px;">
-                    <h3 style="margin: 0;">${data1.name}</h3>
-                    <p style="margin: 5px 0 0 0;">${data1.description}</p>
-                    <p><b>City:</b> ${data1.city}, <b>Country:</b> ${data1.country}</p>
-                    <p><b>Rating:</b> ${data1.rating}</p>
-                    <p><b>Price Range:</b> ${data1.price_range}</p>
-                    <p><b>Phone:</b> ${data1.phone_number}</p>
-                    <a href="${data1.website}" target="_blank">Visit Website</a>
-                  </div>
-                `)
-              )
-              .addTo(map);
-        
-          } catch (error) {
-            console.error('Error fetching nearby destinations:', error);
-          }
-        });
-        
-        
 
+          axiosInstance.post('get_near_by_destination/', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          }).then(res => console.log(res.data));
+        });
 
         new mapboxgl.Marker(markerElement)
           .setLngLat([city.longitude, city.latitude])
           .setPopup(
             new mapboxgl.Popup().setHTML(`
-        <div style="padding: 10px;">
-          <h3 style="margin: 0;">City ${index + 1}</h3>
-          <p style="margin: 5px 0 0 0;">
-            ${index === 0 ? 'Starting Point' : index === cityArray.length - 1 ? 'End Point' : 'Waypoint'}
-          </p>
-        </div>
-      `)
+              <div style="padding: 10px;">
+                <h3 style="margin: 0;">City ${index + 1}</h3>
+                <p style="margin: 5px 0 0 0;">
+                  ${index === 0 ? 'Starting Point' : index === cityArray.length - 1 ? 'End Point' : 'Waypoint'}
+                </p>
+              </div>
+            `)
           )
           .addTo(map);
       });
-
 
       map.addSource('route', {
         type: 'geojson',
@@ -170,8 +130,6 @@ function Map({ data, onCoordinateSelect }) {
       map.fitBounds(bounds, { padding: 50 });
     });
 
-
-
     return () => map.remove();
   }, [data]);
 
@@ -180,7 +138,7 @@ function Map({ data, onCoordinateSelect }) {
       <style>{`
         .mapBox {
           width: 100%;
-          height: 40vh;
+          height: 85vh;
           border-radius: 1rem;
           border: 1px solid rgba(0,0,0,0.5);
         }
@@ -210,4 +168,4 @@ function Map({ data, onCoordinateSelect }) {
   );
 }
 
-export default Map;
+export default NewMaps;
