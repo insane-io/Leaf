@@ -282,7 +282,7 @@ const RouteSearch = () => {
                             }>Click here for Booking</button>
                             </div>
                         <h1 className="text-xl">Reviews</h1>
-                        <Reviews reviewsData={hoteldata.reviews}/>
+                        <Reviews reviews={hoteldata.reviews}/>
                     </div>
 
                 </div>)}
