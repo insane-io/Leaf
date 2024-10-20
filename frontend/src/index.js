@@ -14,6 +14,7 @@ import Register from './Pages/Register';
 import Places from './Pages/Places';
 import Donations from './Pages/Donations';
 import Showplace from './Pages/Showplace';
+import Profile from './Pages/Profile';
 
 
 
@@ -30,11 +31,11 @@ const router = createBrowserRouter(
         <Route path='place/:id' element={<Places/>} />
         <Route path='donations' element={<Donations/>} />
         <Route path='showplace' element={<Showplace/>} />
+        <Route path='profile' element={<Profile/>} />
       </Route>
     </Route>
   )
 )
-
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

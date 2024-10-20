@@ -14,12 +14,15 @@ const CreateAxiosInstance = () => {
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
+      // Set the content type to application/json
+      config.headers['Content-Type'] = 'application/json'; // or 'application/x-www-form-urlencoded' depending on API needs
       return config;
     },
     (error) => {
       return Promise.reject(error);
     }
-  )
+  );
+
   axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
@@ -31,6 +34,7 @@ const CreateAxiosInstance = () => {
       return Promise.reject(error);
     }
   );
+
   return axiosInstance;
 };
 

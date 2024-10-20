@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import CreateAxiosInstance from "../Axios";
 import Reviews from "../Components/Reviews";
+import axios from 'axios';
 
 const Listplace = () => {
   const axiosInstance = CreateAxiosInstance();
+  const location = useLocation();
+  const value = location.state?.filter?.value;
   const navigate = useNavigate();
   const [places, setPlaces] = useState([]);
   const [filteredPlaces, setFilteredPlaces] = useState([]);
@@ -18,38 +21,28 @@ const Listplace = () => {
   });
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await axiosInstance.get('get_place/');
-        
-        // Parse images from string to array safely
-        const formattedPlaces = res.data.map((place) => {
-          // Check if place.images is a string and convert it to valid JSON
-          let imagesArray;
-          try {
-            imagesArray = JSON.parse(place.images.replace(/'/g, '"')); // Replaces single quotes with double quotes
-          } catch (error) {
-            console.error('Error parsing images:', error);
-            imagesArray = []; // Fallback to an empty array if parsing fails
-          }
-
-          return {
-            ...place,
-            images: Array.isArray(imagesArray) ? imagesArray : [imagesArray], // Ensure it's an array
-          };
-        });
-        
-        setPlaces(formattedPlaces);
-        setFilteredPlaces(formattedPlaces);
-      } catch (error) {
-        console.error(error);
+    fetch('http://192.168.0.107:8000/filter_places?city=mumbai', {
+      method: 'GET',
+      headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'DNT': '1', // Do Not Track request header
+      },
+  })
+  .then(response => {
+      if (!response.ok) {
+          throw new Error('Network response was not ok ' + response.statusText);
       }
-    }
-
-    fetchData();
-  }, []);
-
-  // Function to handle filter changes
+      return response.json();
+  })
+  .then(data => {
+      console.log(data);
+  })
+  .catch(error => {
+      console.error('There has been a problem with your fetch operation:', error);
+  });
+  
+  }, [])
   const handleFilterChange = (filterName) => {
     setFilters((prevFilters) => ({
       ...prevFilters,

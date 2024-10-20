@@ -61,6 +61,7 @@ const Donations = () => {
               <p className="font-bold mt-2">Suggested Amount: ₹{option.amount}</p>
             </div>
           ))}
+          
         </div>
       </div>
       <div className="mb-6">

@@ -37,10 +37,9 @@ const Showplace = () => {
 
     fetchData();
   }, []);
-
-  // Function to handle card click
-  const handleCardClick = (placeId) => {
-    navigate(`/listplace/`); // Redirect to ListPlace page with placeId
+  
+  const handleCardClick = (place) => {
+    navigate(`/listplace/`, { state: { filter: { value: place} } });
   };
 
   // Filter and sort places based on search query
@@ -64,7 +63,7 @@ const Showplace = () => {
             className="relative w-48 h-48 overflow-hidden rounded-lg shadow-lg cursor-pointer"
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.3 }}
-            onClick={() => handleCardClick(place.id)} // Redirect on click
+            onClick={() => handleCardClick(place.city)} // Redirect on click
           >
             <img
               src={place.images[0] || 'placeholder-image-url.jpg'}
