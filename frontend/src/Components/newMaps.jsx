@@ -178,7 +178,7 @@ function NewMaps({ data, onCoordinateSelect, handleDestination}) {
       <style>{`
         .mapBox {
           width: 100%;
-          height: 85vh;
+          height: 90vh;
           border-radius: 1rem;
           border: 1px solid rgba(0,0,0,0.5);
         }

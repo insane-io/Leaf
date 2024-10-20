@@ -6,7 +6,7 @@ import { MyContext } from "../Context/MyContext";
 
 const links = [
   { name: "Home", path: "/" },
-  { name: "Plan Your Trip", path: "/dashboard" },
+  { name: "Plan Your Trip", path: "/planmap" },
   { name: "Places", path: "/showplace" },
   { name: "Carbon Calculator", path: "/carbon-calculator" },
   { name: "donation", path: "/donations" },

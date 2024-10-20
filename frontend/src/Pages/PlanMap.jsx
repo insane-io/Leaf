@@ -144,7 +144,7 @@ const RouteSearch = () => {
     };
 
     return (
-        <div className="relative w-full">
+        <div className="relative w-full mt-[3rem] pl-2 pr-2">
             <style>{`.loader {
             border: 8px solid #f3f3f3; /* Light gray */
             border-top: 8px solid #3498db; /* Blue */
