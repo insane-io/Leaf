@@ -168,8 +168,8 @@ function CarbonFootprintCalculator() {
         <div className="p-2 rounded-lg text-center">
           {emission && (
             <>
-              <h2 className="text-2xl font-semibold mb-4">Your Carbon Footprint</h2>
-              <p className="text-gray-700 text-4xl font-bold">{emission}</p>
+              <h2 className="text-xl font-semibold mb-4">Your Carbon Footprint</h2>
+              <p className="text-gray-700 text-2xl font-bold">{emission}</p>
             </>
           )
           }

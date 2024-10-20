@@ -1,8 +1,14 @@
 import React, { useState } from "react"
 import NewMaps from "../Components/newMaps"
 import CreateaxiosInstance from "../Axios"
-
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import { Navigation } from 'swiper/modules';
+import Reviews from "../Components/Reviews";
+import { useNavigate } from "react-router-dom";
 const RouteSearch = () => {
+    const navigate = useNavigate();
     const [source, setSource] = useState("")
     const [destination, setDestination] = useState("")
     const [loader, setLoader] = useState(false)
@@ -11,7 +17,18 @@ const RouteSearch = () => {
     const [openbox, setOpenbox] = useState(false)
     const [showhoteldata, setShowHotelData] = useState(false)
     const [hoteldata, setHOtelData] = useState({})
+    const transportConfig = {
+        Car: { icon: '🚗', lineColor: '#3498db', dashArray: [1] },
+        Train: { icon: '🚂', lineColor: '#2ecc71', dashArray: [1] },
+        Bus: { icon: '🚌', lineColor: '#f1c40f', dashArray: [1] },
+        Plane: { icon: '✈️', lineColor: '#f1c40f', dashArray: [1] }
+    };
     const handleGoBack = () => {
+        setOpenbox(false)
+        setShowHotelData(false)
+        setHOtelData({})
+    }
+    const handleGoBackMain = () => {
         setOpenbox(false)
         setShowHotelData(false)
         setHOtelData({})
@@ -200,15 +217,17 @@ const RouteSearch = () => {
                                 >
                                     <div className="space-y-2">
                                         <h3 className="font-semibold text-lg">Route {index + 1}</h3>
-                                        <p className="text-gray-700">
-                                            <span className="font-medium">Path:</span> {route.route.replace('- ', '')}
-                                        </p>
+                                        <h3 className="font-semibold text-lg">
+                                            <span className="font-semibold text-lg">Path:</span>
+                                            <span className="text-lg">{route.route.replace('- ', '')}</span>
+                                        </h3>
+                                        <h3>
+                                            <span className="font-semibold text-xl">Vehicle:</span>
+                                            <span className="font-semibold text-xl">{transportConfig[route.vehicle].icon || transportConfig['Car'].icon} {route.vehicle}</span>
+                                        </h3>
                                         <div className="grid grid-cols-2 gap-2 text-sm">
                                             <p>
                                                 <span className="font-medium">Distance:</span> {route.distance}
-                                            </p>
-                                            <p>
-                                                <span className="font-medium">Vehicle:</span> {route.vehicle}
                                             </p>
                                             <p>
                                                 <span className="font-medium">Carbon Footprint:</span> {route.carbon_footprint}
@@ -227,15 +246,26 @@ const RouteSearch = () => {
                     )}
                 </div>
                 )}
-                {openbox && showhoteldata && (<div className="overflow-y-auto ">
+                {openbox && showhoteldata && (<div className="">
                     <button onClick={handleGoBack}>
-                    &#8592; Go Back
+                        &#8592; Go Back
                     </button>
-                    <div style={{ padding: '10px' }}>
-                        <h3 style={{ margin: 0 }}>{hoteldata.name}</h3>
-                        <p style={{ margin: '5px 0 0 0' }}>{hoteldata.description}</p>
+                    <div style={{ padding: '10px' }} className="overflow-y-auto max-h-[45rem]">
+                        <h1 className="text-xl m-2 font-bold">{hoteldata.name}</h1>
+                        {/* <App images={JSON.parse(hoteldata.images.replace(/'/g, '"'))}/> */}
+                        <Swiper navigation={true} modules={[Navigation]} className="mySwiper">
+                            {
+                                JSON.parse(hoteldata.images.replace(/'/g, '"')).map((d) => (
+                                    <SwiperSlide><img src={`${d}`} alt="" className='h-[20rem] border rounded-lg w-full' /></SwiperSlide>
+                                ))
+                            }
+                        </Swiper>
+                        <p style={{ margin: '5px 0 0 0' }} className="text-lg">{hoteldata.description}</p>
                         <p>
-                            <b>City:</b> {hoteldata.city}, <b>Country:</b> {hoteldata.country}
+                            <b>City:</b> {hoteldata.city}
+                        </p>
+                        <p>
+                            <b>Country:</b> {hoteldata.country}
                         </p>
                         <p>
                             <b>Rating:</b> {hoteldata.rating}
@@ -247,6 +277,12 @@ const RouteSearch = () => {
                             <b>Phone:</b> {hoteldata.phone_number}
                         </p>
                         {/* <a href={hoteldata.website} target="_blank">Visit Website</a> */}
+                        <div className="flex justify-center m-2">
+                            <button className="bg-cyan-300 p-3 font-bold text-xl rounded" onClick={()=>{navigate(`/place/${hoteldata.id}`)}
+                            }>Click here for Booking</button>
+                            </div>
+                        <h1 className="text-xl">Reviews</h1>
+                        <Reviews reviewsData={hoteldata.reviews}/>
                     </div>
 
                 </div>)}
@@ -254,6 +290,9 @@ const RouteSearch = () => {
                     openbox && !showhoteldata && (<div
                         className="border p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow bg-gray-50"
                     >
+                        <button onClick={handleGoBackMain}>
+                            &#8592; Go Back
+                        </button>
                         <div className="space-y-2">
                             <h3 className="font-semibold text-lg">Route</h3>
                             <p className="text-gray-700">

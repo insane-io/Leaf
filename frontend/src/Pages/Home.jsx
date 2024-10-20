@@ -130,14 +130,14 @@ const Home = () => {
             <p className="text-lg text-gray-700 mb-6">
               Plan and book eco-friendly travel experiences without compromising on convenience or adventure.
             </p>
-            <button onClick={navigate('/planmap')} className="bg-[#008370] text-white py-2 px-6 rounded-full text-lg font-semibold">Plan Your Trip</button>
+            <button onClick={()=>navigate('/planmap')} className="bg-[#008370] text-white py-2 px-6 rounded-full text-lg font-semibold">Plan Your Trip</button>
           </div>
         </div>
         <div className='mt-16 bg-gray-300 m-24 rounded-2xl  '>
           <section id="calculator" className="pt-16 pb-7 text-center">
             <h2 className="text-5xl font-bold text-gray-500 mb-4">Calculate Your Travel Carbon Footprint</h2>
             <p className="mb-8 text-gray-600">Calculate the environmental impact of your travel choices and explore greener alternatives.</p>
-            <button onClick={navigate('/carbon-calculator')} className="bg-[#EFCA10] text-white py-2 px-6 rounded-full">Try Now</button>
+            <button onClick={()=>navigate('/carbon-calculator')} className="bg-[#EFCA10] text-white py-2 px-6 rounded-full">Try Now</button>
           </section>
         </div>
         <div>
