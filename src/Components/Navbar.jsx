@@ -2,13 +2,14 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MyContext } from "../Context/MyContext";
+import logo from '../Assets/logo.png';
 
 const links = [
   { name: "Home", path: "/" },
   { name: "Plan Your Trip", path: "/dashboard" },
   { name: "Places", path: "/listplace" },
   { name: "Carbon Calculator", path: "/carbon-calculator" },
-  { name: "Donation", path: "/donation" },
+  { name: "donation", path: "/donations" },
   { name: "Redeem", path: "/redeem" },
   { name: "Profile", path: "/profile" },
 ];
@@ -73,7 +74,7 @@ const Navbar = () => {
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-1">
         <div className="flex items-center space-x-3 rtl:space-x-reverse">
           <Link to="/">
-            <img src="https://img.freepik.com/free-vector/bird-colorful-logo-gradient-vector_343694-1365.jpg" className="h-14 w-24" alt="Logo" />
+            <img src={logo} className="h-14 w-24" alt="Logo" />
           </Link>
         </div>
         <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">

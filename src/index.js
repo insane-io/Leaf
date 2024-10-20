@@ -15,6 +15,8 @@ import Places from './Pages/Places';
 import Donations from './Pages/Donations';
 import Showplace from './Pages/Showplace';
 import Redeem from './Pages/Redeem';
+import Calculator from './Pages/Calculator';
+import Profile from './Pages/Profile';
 
 
 
@@ -32,6 +34,8 @@ const router = createBrowserRouter(
         <Route path='donations' element={<Donations/>} />
         <Route path='showplace' element={<Showplace/>} />
         <Route path='redeem' element={<Redeem/>} />
+        <Route path='carbon-calculator' element={<Calculator/>} />
+        <Route path='profile' element={<Profile/>} />
       </Route>
     </Route>
   )
