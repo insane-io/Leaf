@@ -15,8 +15,7 @@ import Places from './Pages/Places';
 import Donations from './Pages/Donations';
 import Showplace from './Pages/Showplace';
 import Profile from './Pages/Profile';
-
-
+import PlanMap from './Pages/PlanMap';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -31,7 +30,6 @@ const router = createBrowserRouter(
         <Route path='place/:id' element={<Places/>} />
         <Route path='donations' element={<Donations/>} />
         <Route path='showplace' element={<Showplace/>} />
-        <Route path='profile' element={<Profile/>} />
       </Route>
     </Route>
   )
