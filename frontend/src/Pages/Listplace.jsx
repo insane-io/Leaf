@@ -15,7 +15,7 @@ const Listplace = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await axios.get(`http://192.168.0.107:8000/get_or_filter_places/?name=${value}`);
+        const res = await axios.get(`http://192.168.0.107:8000/get_or_filter_places/?city=${value}`);
         console.log(res.data)
         
         const formattedPlaces = res.data.map((place) => {

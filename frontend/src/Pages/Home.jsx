@@ -5,8 +5,11 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import React, { useState, useRef } from 'react';
 import { motion, useDragControls } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
+
+  const navigate = useNavigate()
   const [selectedDate, setSelectedDate] = useState(null);
   const hotels = [
     {
@@ -141,7 +144,7 @@ const Home = () => {
           <section id="calculator" className="pt-16 pb-7 text-center">
             <h2 className="text-5xl font-bold text-gray-500 mb-4">Calculate Your Travel Carbon Footprint</h2>
             <p className="mb-8 text-gray-600">Calculate the environmental impact of your travel choices and explore greener alternatives.</p>
-            <button className="bg-[#EFCA10] text-white py-2 px-6 rounded-full">Try Now</button>
+            <button onClick={navigate('/carbon-calculator')} className="bg-[#EFCA10] text-white py-2 px-6 rounded-full">Try Now</button>
           </section>
         </div>
         <div>

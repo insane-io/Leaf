@@ -17,7 +17,6 @@ import Showplace from './Pages/Showplace';
 import Redeem from './Pages/Redeem';
 import Calculator from './Pages/Calculator';
 import Profile from './Pages/Profile';
-import PlanMap from './Pages/PlanMap';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -26,15 +25,15 @@ const router = createBrowserRouter(
         <Route path='' element={<Home />} />
         <Route path='tourguider' element={<TourGuider />} />
         <Route path='listplace' element={<Listplace />} />
-        <Route path='dashboard' element={<DashBoard/>} />
-        <Route path='login' element={<Login/>} />
-        <Route path='register' element={<Register/>} />
-        <Route path='place/:id' element={<Places/>} />
-        <Route path='donations' element={<Donations/>} />
-        <Route path='showplace' element={<Showplace/>} />
-        <Route path='redeem' element={<Redeem/>} />
-        <Route path='carbon-calculator' element={<Calculator/>} />
-        <Route path='profile' element={<Profile/>} />
+        <Route path='dashboard' element={<DashBoard />} />
+        <Route path='login' element={<Login />} />
+        <Route path='register' element={<Register />} />
+        <Route path='place/:id' element={<Places />} />
+        <Route path='donations' element={<Donations />} />
+        <Route path='showplace' element={<Showplace />} />
+        <Route path='redeem' element={<Redeem />} />
+        <Route path='carbon-calculator' element={<Calculator />} />
+        <Route path='profile' element={<Profile />} />
       </Route>
     </Route>
   )
