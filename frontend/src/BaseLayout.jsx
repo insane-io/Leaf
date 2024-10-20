@@ -8,7 +8,7 @@ const BaseLayout = () => {
     <>
       <div className=''>
         <Navbar />
-        <div className=' '>
+        <div className='pt-7'>
           <Outlet />
         </div>
       </div>

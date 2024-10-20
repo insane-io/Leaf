@@ -126,7 +126,7 @@ const RouteSearch = () => {
   };
 
   return (
-    <div className="bg-white shadow-lg p-6 mx-auto rounded-lg space-y-4">
+    <div className="bg-white shadow-lg p-6 mx-auto rounded-lg space-y-4 mt-10">
       <div className="flex flex-col sm:flex-row gap-4">
         <input
           type="text"

@@ -46,7 +46,7 @@ const Profile = () => {
     }
     return (
         <>
-            <div className='flex flex-col items-center justify-center p-7 '>
+            <div className='flex flex-col items-center justify-center p-7 mt-16'>
                 <div className="flex flex-col items-center mb-12">
                     <img src={`https://api.dicebear.com/9.x/initials/svg?seed=${done.first_name}`} alt="Profile" className="rounded-full" style={{ width: '170px', height: '170px' }} />
                     <span className="mt-4 text-2xl font-semibold">{done?.user?.first_name} {done?.user?.last_name}</span>

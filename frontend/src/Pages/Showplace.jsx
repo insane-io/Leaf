@@ -57,11 +57,11 @@ const Showplace = () => {
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
       />
-      <div className="flex flex-wrap gap-4 justify-center">
+      <div className="grid grid-cols-3 gap-5">
         {filteredPlaces.map(place => (
           <motion.div
             key={place.id}
-            className="relative w-48 h-48 overflow-hidden rounded-lg shadow-lg cursor-pointer"
+            className="relative overflow-hidden rounded-lg shadow-lg cursor-pointer"
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.3 }}
             onClick={() => handleCardClick(place.city)} // Redirect on click
