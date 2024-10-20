@@ -104,7 +104,7 @@ function NewMaps({ data, onCoordinateSelect, handleDestination}) {
           .setPopup(
             new mapboxgl.Popup().setHTML(`
               <div style="padding: 10px;">
-                <h3 style="margin: 0;">City ${index + 1}</h3>
+                <h3 style="margin: 0;">${data.route.split("-")[index]}</h3>
                 <p style="margin: 5px 0 0 0;">
                   ${index === 0 ? 'Starting Point' : index === cityArray.length - 1 ? 'End Point' : 'Waypoint'}
                 </p>

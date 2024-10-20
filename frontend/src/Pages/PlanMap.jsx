@@ -6,7 +6,9 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import { Navigation } from 'swiper/modules';
 import Reviews from "../Components/Reviews";
+import { useNavigate } from "react-router-dom";
 const RouteSearch = () => {
+    const navigate = useNavigate();
     const [source, setSource] = useState("")
     const [destination, setDestination] = useState("")
     const [loader, setLoader] = useState(false)
@@ -275,6 +277,10 @@ const RouteSearch = () => {
                             <b>Phone:</b> {hoteldata.phone_number}
                         </p>
                         {/* <a href={hoteldata.website} target="_blank">Visit Website</a> */}
+                        <div className="flex justify-center m-2">
+                            <button className="bg-cyan-300 p-3 font-bold text-xl rounded" onClick={()=>{navigate(`/place/${hoteldata.id}`)}
+                            }>Click here for Booking</button>
+                            </div>
                         <h1 className="text-xl">Reviews</h1>
                         <Reviews reviewsData={hoteldata.reviews}/>
                     </div>
