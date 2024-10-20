@@ -45,9 +45,10 @@ const Listplace = () => {
   console.log(data)
   return (
     <div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 m-[4rem]">
         {data.map((place) => (
-          <motion.div
+          <div className='flex flex-col'>
+                      <motion.div
             key={place.id}
             className="relative overflow-hidden rounded-lg shadow-lg cursor-pointer"
             whileHover={{ scale: 1.05 }}
@@ -69,6 +70,9 @@ const Listplace = () => {
               <p className="text-sm">Visits: {place.visits}</p>
             </motion.div>
           </motion.div>
+          <h1 className='flex p-2 items-center justify-center text-xl'>{place.name}</h1>
+          </div>
+
         ))}
       </div>
     </div>
