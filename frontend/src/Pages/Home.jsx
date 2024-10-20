@@ -124,7 +124,6 @@ const Home = () => {
             {/* Placeholder for an image or icon */}
             <img src="https://img.freepik.com/free-photo/hand-having-magnifying-glass-close-up_23-2148925822.jpg?semt=ais_hybrid" alt="Eco-Friendly" className="w-3/4 h-auto rounded-xl shadow-lg" />
           </div>
-
           {/* Right Column */}
           <div className="col-span-2 flex flex-col items-start justify-start">
             <h1 className="text-7xl font-bold mb-4">Explore the World, Sustainably</h1>

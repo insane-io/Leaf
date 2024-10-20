@@ -27,7 +27,7 @@ const Login = () => {
 
     try {
       console.log(postData);
-      const res = await axios.post(`http://192.168.0.107:8000/login/`, postData);
+      const res = await axios.post(`http://192.168.0.103:8000/login/`, postData);
       localStorage.setItem("access_token", res.data.access);
       localStorage.setItem("refresh_token", res.data.refresh);
       axiosInstance.defaults.headers["Authorization"] =

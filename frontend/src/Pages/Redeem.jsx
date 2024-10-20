@@ -21,8 +21,6 @@ const Redeem = () => {
   const [selectedProducts, setSelectedProducts] = useState([]); // Track selected products
   const [successMessage, setSuccessMessage] = useState('');
   const [totalCredits, setTotalCredits] = useState(100); // Example total credits
-
-  // Calculate total credits required for selected products
   const totalCreditsRequired = selectedProducts.reduce((total, product) => total + product.credits, 0);
 
   const handleToggleProduct = (product) => {
@@ -47,7 +45,7 @@ const Redeem = () => {
     <div className="mx-8 my-10">
       <h1 className="text-3xl font-bold mb-6">Redeem Your Credits</h1>
       <p className="text-lg mb-4">Total Credits: <span className="font-bold">{totalCredits}</span></p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         {products.map(product => (
           <div
             key={product.id}

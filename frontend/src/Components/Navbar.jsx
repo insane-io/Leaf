@@ -17,7 +17,7 @@ const links = [
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selected, setSelected] = useState(0);
-  const [formerColor, setFormerColor] = useState("#808080"); // Default color
+  const [formerColor, setFormerColor] = useState("#808080");
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const { login } = useContext(MyContext);

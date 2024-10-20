@@ -1,30 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import Carousal from "../Components/Carousal";
-import CreateAxiosInstance from "../Axios"; 
+import CreateAxiosInstance from "../Axios";
 import { useParams } from 'react-router-dom';
+import DatePicker from 'react-datepicker';
+import Reviews from '../Components/Reviews';
 
 const Places = () => {
-  const axiosInstance = CreateAxiosInstance(); 
+  const axiosInstance = CreateAxiosInstance();
   const [place, setPlace] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [buttonText, setButtonText] = useState('Book Hotel'); 
+  const [buttonText, setButtonText] = useState('Book Hotel');
   const [buttonColor, setButtonColor] = useState('bg-blue-500');
-  const {id} = useParams() 
+  const { id } = useParams();
+  const [startDate, setStartDate] = useState();
+  const [payid, setpayid] = useState();
 
   useEffect(() => {
     async function fetchPlace() {
       try {
-        const response = await axiosInstance.get(`get_or_filter_places/?id=${id}`); // Use axiosInstance to fetch data
+        const response = await axiosInstance.get(`get_or_filter_places/?id=${id}`);
         setPlace(response.data);
         setLoading(false);
+        console.log("res", response.data);
       } catch (error) {
         console.error('Error fetching place data:', error);
         setLoading(false);
       }
     }
-    
+
     fetchPlace();
-  }, []);
+  }, [id]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -36,9 +41,7 @@ const Places = () => {
 
   let images = [];
   try {
-    // Check if images is a valid string before parsing
     if (place.images && typeof place.images === 'string') {
-      // Replace single quotes with double quotes for JSON parsing
       const formattedImages = place.images.replace(/'/g, '"');
       images = JSON.parse(formattedImages);
     }
@@ -47,63 +50,105 @@ const Places = () => {
     images = [];
   }
 
-  console.log(images)
-
   const handleBooking = () => {
-    // Change button text and color on click
     setButtonText('Booked Successfully');
-    setButtonColor('bg-green-500'); // Change color to green
+    setButtonColor('bg-green-500');
   };
+
+  const handlePay = () => {
+    async function book(data) {
+      try {
+        const formData = new FormData();
+        formData.append('carbon_footprint', 200);
+        formData.append('price', place.price_range);
+        formData.append('place_id', id);
+        formData.append('payment_id', data);
+  
+        const res = await axiosInstance.post('create_booking/', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        console.log(res);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  
+    const amountInPaise = place.price_range * 100;
+  
+    const options = {
+      key: 'rzp_test_g1hNEV9xyquwrL',
+      amount: amountInPaise,
+      currency: 'INR',
+      name: 'Green Donation',
+      handler: (response) => {
+        console.log('Payment Response:', response);
+        setpayid(response);
+        book(response.razorpay_payment_id);
+      },
+      prefill: {
+        name: 'Your Name',
+        email: 'email@example.com',
+        contact: '1234567890',
+      },
+      theme: {
+        color: '#3399cc',
+      },
+    };
+  
+    const rzp1 = new window.Razorpay(options);
+    rzp1.open();
+  };
+  
 
   return (
     <div className='mx-72 mt-[3rem]'>
-      <Carousal images={images} /> {/* Pass the images to Carousal */}
+      <Carousal images={images} />
       <div className='flex justify-between mt-16'>
         <h1 className='text-4xl font-semibold my-3'>{place.name}</h1>
-        <h1 className='text-lg'>Rating: {place.rating}</h1>
+        <div className='flex flex-col items-end'>
+          <h1 className='text-2xl font-bold mb-3'>Price: {place.price_range}</h1>
+          <div className='flex gap-4'>
+            <DatePicker selected={startDate} className='border-2 p-3' placeholderText='Enter Date for booking' onChange={(date) => setStartDate(date)} />
+            <button
+              onClick={handlePay}
+              className={`${buttonColor} text-white bg-[#088474] font-bold py-2 px-4 rounded`}
+            >
+              {buttonText}
+            </button>
+          </div>
+          <h1 className='text-lg'>Rating: {place.rating}</h1>
+        </div>
       </div>
       <h1 className='text-xl'>{place.description}</h1>
       <div className='mt-4'>
         <h2 className='text-2xl font-medium'>Price Range: {place.price_range || 'N/A'}</h2>
       </div>
-      {/* Eco-Friendly Certified Badges Section */}
       <div className='flex space-x-4 mt-6'>
         {place.certifications && place.certifications.map((certification) => (
           <div key={certification.name} className='flex flex-col items-center'>
-            <img 
-              src={certification.imageUrl} 
-              alt={certification.name} 
-              className='w-16 h-16 rounded-full' // Circular badge style
+            <img
+              src={certification.imageUrl}
+              alt={certification.name}
+              className='w-16 h-16 rounded-full'
             />
             <span className='mt-2 text-center'>{certification.name}</span>
           </div>
         ))}
       </div>
       <div className='mt-6'>
+        <div className='flex justify-between'>
         <h2 className='text-2xl font-medium mb-4'>Reviews:</h2>
+        <button className='bg-[#088474] rounded-xl p-3 text-white'>Add Review</button>
+        </div>
         {place.reviews && place.reviews.length > 0 ? (
-          <ul className='space-y-4'>
-            {place.reviews.map((review) => (
-              <li key={review.id} className='border p-4 rounded'>
-                <div className='flex justify-between items-center'>
-                  <h3 className='text-lg font-semibold'>Rating: {review.rating}</h3>
-                </div>
-                <p className='mt-2'>{review.review}</p>
-              </li>
-            ))}
-          </ul>
+          <Reviews reviews={place.reviews} />
         ) : (
           <p>No reviews available for this place.</p>
         )}
       </div>
-      <div className='mt-8 flex justify-center'>
-        <button
-          onClick={handleBooking}
-          className={`${buttonColor} hover:bg-green-700 text-white font-bold py-2 px-4 rounded`} // Use buttonColor state for button background color
-        >
-          {buttonText} {/* Use buttonText state for button label */}
-        </button>
-      </div>
+      <div className='mt-8 flex justify-center'></div>
     </div>
   );
 };
