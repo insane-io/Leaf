@@ -125,6 +125,20 @@ const Places = () => {
       <div className='mt-4'>
         <h2 className='text-2xl font-medium'>Price Range: {place.price_range || 'N/A'}</h2>
       </div>
+
+      {/* Badge Display */}
+      <h1 className='text-2xl font-medium mt-6'>Certified by</h1>
+      {place.badge && (
+        <div className='mt-4 flex items-center space-x-4'>
+          <img
+            src={place.badge.photo}
+            alt={place.badge.title}
+            className='w-20 h-20 rounded-full'
+          />
+          <h3 className='text-lg font-medium'>{place.badge.title}</h3>
+        </div>
+      )}
+
       <div className='flex space-x-4 mt-6'>
         {place.certifications && place.certifications.map((certification) => (
           <div key={certification.name} className='flex flex-col items-center'>
@@ -137,10 +151,11 @@ const Places = () => {
           </div>
         ))}
       </div>
+
       <div className='mt-6'>
         <div className='flex justify-between'>
-        <h2 className='text-2xl font-medium mb-4'>Reviews:</h2>
-        <button className='bg-[#088474] rounded-xl p-3 text-white'>Add Review</button>
+          <h2 className='text-2xl font-medium mb-4'>Reviews:</h2>
+          <button className='bg-[#088474] rounded-xl p-3 text-white'>Add Review</button>
         </div>
         {place.reviews && place.reviews.length > 0 ? (
           <Reviews reviews={place.reviews} />
