@@ -49,7 +49,7 @@ const Showplace = () => {
     .sort((a, b) => a.city.localeCompare(b.city)); // Sort alphabetically by city
 
   return (
-    <div className="mx-8 my-10 p-4">
+    <div className="mx-8 my-10 pt-5">
       <input
         type="text"
         placeholder="Search by city..."
