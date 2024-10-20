@@ -3,9 +3,10 @@ export const MyContext = createContext("");
 
 const UserProvider = ({ children }) => {
   const [login, setLogin] = useState(!!localStorage.getItem("access_token"));
+  const [userName, setUserName] = useState(localStorage.getItem("user_name") || '');
   
   return (
-    <MyContext.Provider value={{login, setLogin}}>
+    <MyContext.Provider value={{login, setLogin, userName, setUserName}}>
       {children}
     </MyContext.Provider>
   );

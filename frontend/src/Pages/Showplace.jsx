@@ -12,7 +12,8 @@ const Showplace = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await axiosInstance.get('get_place/');
+        const res = await axiosInstance.get('get_or_filter_places/');
+        console.log(res.data)
         
         const formattedPlaces = res.data.map((place) => {
           let imagesArray;

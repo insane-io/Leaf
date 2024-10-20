@@ -1,120 +1,52 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { useLocation, useNavigate } from 'react-router-dom';
-import CreateAxiosInstance from "../Axios";
-import Reviews from "../Components/Reviews";
 import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+
 
 const Listplace = () => {
-  const axiosInstance = CreateAxiosInstance();
+
+  const [data, setdata] = useState([])
+  const [images, setImages] = useState()
+  const navigate = useNavigate()
   const location = useLocation();
   const value = location.state?.filter?.value;
-  const navigate = useNavigate();
-  const [places, setPlaces] = useState([]);
-  const [filteredPlaces, setFilteredPlaces] = useState([]);
-  const [filters, setFilters] = useState({
-    lessCrowd: false,
-    mediumCrowd: false,
-    largeCrowd: false,
-    highestRating: false,
-    mostVisited: false,
-  });
 
   useEffect(() => {
-    fetch('http://192.168.0.107:8000/filter_places?city=mumbai', {
-      method: 'GET',
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'DNT': '1', // Do Not Track request header
-      },
-  })
-  .then(response => {
-      if (!response.ok) {
-          throw new Error('Network response was not ok ' + response.statusText);
+    async function fetchData() {
+      try {
+        const res = await axios.get(`http://192.168.0.107:8000/get_or_filter_places/?name=${value}`);
+        console.log(res.data)
+        
+        const formattedPlaces = res.data.map((place) => {
+          let imagesArray;
+          try {
+            imagesArray = JSON.parse(place.images.replace(/'/g, '"'));
+          } catch (error) {
+            console.error('Error parsing images:', error);
+            imagesArray = [];
+          }
+
+          return {
+            ...place,
+            images: Array.isArray(imagesArray) ? imagesArray : [imagesArray],
+          };
+        });
+        
+        setdata(formattedPlaces);
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
-      return response.json();
-  })
-  .then(data => {
-      console.log(data);
-  })
-  .catch(error => {
-      console.error('There has been a problem with your fetch operation:', error);
-  });
-  
-  }, [])
-  const handleFilterChange = (filterName) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [filterName]: !prevFilters[filterName],
-    }));
-  };
-
-  // Function to filter places based on the selected filters
-  useEffect(() => {
-    let updatedPlaces = [...places];
-
-    if (filters.lessCrowd) {
-      updatedPlaces = updatedPlaces.filter((place) => place.crowd === 'less');
-    }
-    if (filters.mediumCrowd) {
-      updatedPlaces = updatedPlaces.filter((place) => place.crowd === 'medium');
-    }
-    if (filters.largeCrowd) {
-      updatedPlaces = updatedPlaces.filter((place) => place.crowd === 'large');
-    }
-    if (filters.highestRating) {
-      updatedPlaces = updatedPlaces.sort((a, b) => b.rating - a.rating);
-    }
-    if (filters.mostVisited) {
-      updatedPlaces = updatedPlaces.sort((a, b) => b.visits - a.visits);
     }
 
-    setFilteredPlaces(updatedPlaces);
-  }, [filters, places]);
+    fetchData();
+  }, []);
 
+  console.log(data)
   return (
-    <div className="p-6">
-      {/* Filter Buttons */}
-      <div className="mb-6">
-        <h2 className="text-xl font-bold mb-4">Filter Places</h2>
-        <div className="flex flex-wrap gap-4">
-          <button
-            className={`px-4 py-2 rounded ${filters.lessCrowd ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-            onClick={() => handleFilterChange('lessCrowd')}
-          >
-            Less Crowd
-          </button>
-          <button
-            className={`px-4 py-2 rounded ${filters.mediumCrowd ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-            onClick={() => handleFilterChange('mediumCrowd')}
-          >
-            Medium Crowd
-          </button>
-          <button
-            className={`px-4 py-2 rounded ${filters.largeCrowd ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-            onClick={() => handleFilterChange('largeCrowd')}
-          >
-            Large Crowd
-          </button>
-          <button
-            className={`px-4 py-2 rounded ${filters.highestRating ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-            onClick={() => handleFilterChange('highestRating')}
-          >
-            Highest Rating
-          </button>
-          <button
-            className={`px-4 py-2 rounded ${filters.mostVisited ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-            onClick={() => handleFilterChange('mostVisited')}
-          >
-            Most Visited
-          </button>
-        </div>
-      </div>
-
-      {/* Places List */}
+    <div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {filteredPlaces.map((place) => (
+        {data.map((place) => (
           <motion.div
             key={place.id}
             className="relative overflow-hidden rounded-lg shadow-lg cursor-pointer"
@@ -122,7 +54,7 @@ const Listplace = () => {
             onClick={() => navigate(`/place/${place.id}`)}
           >
             <img
-              src={place.images[0]} // Access the first image safely
+              src={`${place.images[0]}`}
               alt={place.name}
               className="w-full h-64 object-cover"
             />
@@ -139,9 +71,8 @@ const Listplace = () => {
           </motion.div>
         ))}
       </div>
-      <Reviews />
     </div>
-  );
-};
+  )
+}
 
-export default Listplace;
+export default Listplace

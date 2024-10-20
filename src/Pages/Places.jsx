@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import Carousal from "../Components/Carousal";
-import CreateAxiosInstance from "../Axios"; 
-import { useParams } from 'react-router-dom';
+import CreateAxiosInstance from "../Axios"; // Import your axios instance function
 
 const Places = () => {
-  const axiosInstance = CreateAxiosInstance(); 
+  const axiosInstance = CreateAxiosInstance(); // Create an axios instance
   const [place, setPlace] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [buttonText, setButtonText] = useState('Book Hotel'); 
-  const [buttonColor, setButtonColor] = useState('bg-blue-500');
-  const {id} = useParams() 
+  const [buttonText, setButtonText] = useState('Book Hotel'); // State for button text
+  const [buttonColor, setButtonColor] = useState('bg-blue-500'); // State for button color
 
   useEffect(() => {
     async function fetchPlace() {
       try {
-        const response = await axiosInstance.get(`get_or_filter_places/?id=${id}`); // Use axiosInstance to fetch data
+        const response = await axiosInstance.get('get_place/?id=3'); // Use axiosInstance to fetch data
         setPlace(response.data);
         setLoading(false);
       } catch (error) {
@@ -44,10 +42,8 @@ const Places = () => {
     }
   } catch (error) {
     console.error('Error parsing images:', error);
-    images = [];
+    images = []; // Fallback to an empty array if parsing fails
   }
-
-  console.log(images)
 
   const handleBooking = () => {
     // Change button text and color on click
