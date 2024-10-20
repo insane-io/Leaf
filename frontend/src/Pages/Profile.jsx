@@ -14,15 +14,6 @@ const Profile = () => {
     const [modalContent, setModalContent] = useState('');
     const [appointment, setAppointment] = useState([])
 
-    const handleOpenModal = (content) => {
-        setModalContent(content);
-        setShowModal(true);
-    };
-
-    const handleCloseModal = () => {
-        setShowModal(false);
-        setModalContent('');
-    };
     const [done, setDone] = useState([])
 
     useEffect(() => {
@@ -32,7 +23,7 @@ const Profile = () => {
                 console.log(res.data)
                 setDone(res.data)
             } catch (error) {
-
+                console.log(error)
             }
         }
         getData()

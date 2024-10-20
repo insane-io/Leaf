@@ -1,45 +1,61 @@
-import React, { useState } from 'react';
-
-const products = [
-  {
-    id: 1,
-    name: 'Tree',
-    description: 'Plant a tree to help combat climate change.',
-    credits: 50,
-    imageUrl: 'https://via.placeholder.com/150?text=Tree', // Replace with actual tree image URL
-  },
-  {
-    id: 2,
-    name: 'Natural Soap',
-    description: 'Eco-friendly natural soap made from organic ingredients.',
-    credits: 30,
-    imageUrl: 'https://via.placeholder.com/150?text=Natural+Soap', // Replace with actual product image URL
-  },
-];
+import React, { useEffect, useState } from 'react';
+import CreateAxiosInstance from "../Axios";
 
 const Redeem = () => {
-  const [selectedProducts, setSelectedProducts] = useState([]); // Track selected products
+  const axiosInstance = CreateAxiosInstance();
+  const [selectedProducts, setSelectedProducts] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
-  const [totalCredits, setTotalCredits] = useState(100); // Example total credits
-  const totalCreditsRequired = selectedProducts.reduce((total, product) => total + product.credits, 0);
+  const [totalCredits, setTotalCredits] = useState(0);
+  const [products, setProducts] = useState([]);
+  const [flag, setflag] = useState(false);
 
-  const handleToggleProduct = (product) => {
-    if (selectedProducts.some(selected => selected.id === product.id)) {
-      setSelectedProducts(prev => prev.filter(selected => selected.id !== product.id)); // Deselect product
+  const totalCreditsRequired = selectedProducts.reduce((total, product) => total + product.worth, 0);
+
+  const handleSelectProduct = (product) => {
+    const isSelected = selectedProducts.some(selected => selected.id === product.id);
+    
+    if (isSelected) {
+      setSelectedProducts(selectedProducts.filter(selected => selected.id !== product.id));
     } else {
-      setSelectedProducts(prev => [...prev, product]); // Select product
+      setSelectedProducts([...selectedProducts, product]);
     }
   };
 
-  const handleRedeem = () => {
-    if (totalCredits >= totalCreditsRequired) {
-      setTotalCredits(prevCredits => prevCredits - totalCreditsRequired); // Deduct credits
-      setSuccessMessage(`Successfully redeemed for ${selectedProducts.map(product => product.name).join(', ')}!`);
-      setSelectedProducts([]); // Reset selection after redemption
-    } else {
-      setSuccessMessage('Not enough credits to redeem the selected products.');
+  const handleRedeem = async () => {
+    const productIds = selectedProducts.map(product => product.id);
+
+    const formData = new FormData();
+    productIds.forEach(id => formData.append('pro_id', id)); // Append each product ID to FormData
+
+    try {
+      const response = await axiosInstance.post('redeem_coupon/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      setSuccessMessage('Product redeemed successfully!');
+      setSelectedProducts([]);
+      const updatedProfile = await axiosInstance('profile/');
+      setTotalCredits(updatedProfile.data.credit_coins);
+      setflag(!flag); // To trigger a re-render and refetch data
+    } catch (error) {
+      console.log(error);
     }
   };
+
+  useEffect(() => {
+    async function getData() {
+      try {
+        const res = await axiosInstance.get('get_product/');
+        const profileRes = await axiosInstance.get('profile/');
+        setProducts(res.data);
+        setTotalCredits(profileRes.data.credit_coins);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getData();
+  }, [flag]);
 
   return (
     <div className="mx-8 my-10">
@@ -49,13 +65,13 @@ const Redeem = () => {
         {products.map(product => (
           <div
             key={product.id}
+            onClick={() => handleSelectProduct(product)} // Handle product selection
             className={`p-4 border rounded-lg cursor-pointer ${selectedProducts.some(selected => selected.id === product.id) ? 'border-green-500 bg-green-100' : 'border-gray-300'}`}
-            onClick={() => handleToggleProduct(product)} // Toggle product selection
           >
-            <img src={product.imageUrl} alt={product.name} className="w-full h-32 object-cover rounded" />
-            <h3 className="text-lg font-medium mt-2">{product.name}</h3>
+            <img src={`${product.photo}`} alt={product.name} className="w-full h-32 object-cover rounded" />
+            <h3 className="text-lg font-medium mt-2">{product.title}</h3>
             <p className="text-sm text-gray-600">{product.description}</p>
-            <p className="font-bold mt-2">Credits Required: {product.credits}</p>
+            <p className="font-bold mt-2">Credits Required: {product.worth}</p>
           </div>
         ))}
       </div>
@@ -64,7 +80,7 @@ const Redeem = () => {
         className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4 ${totalCreditsRequired === 0 || totalCredits < totalCreditsRequired ? 'opacity-50 cursor-not-allowed' : ''}`}
         disabled={totalCreditsRequired === 0 || totalCredits < totalCreditsRequired}
       >
-        Redeem Products
+        Redeem Product
       </button>
       {successMessage && (
         <div className="mt-6 text-green-600 font-medium">
